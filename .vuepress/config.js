@@ -1,7 +1,6 @@
 module.exports = {
     title: 'BlogMan',
     description: '曾今我也以为梦想遥不可及',
-    base:'https://github.com/jeryqwq/BlogMan',
     themeConfig: {
         nav: [
             { text: '前端', link: '/' },
