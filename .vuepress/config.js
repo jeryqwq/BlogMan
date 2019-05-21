@@ -17,7 +17,6 @@ module.exports = {
               '/Base/JSApi',
               '/Base/Promise',
               '/Base/Render',
-
               '/Base/Git',
             ]
           },

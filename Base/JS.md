@@ -66,7 +66,7 @@ fn1();//DJ
 
 ```
 ##  原型链
-## 对象克隆
+## 对象拷贝
 ## 闭包
 闭包在应用中非常常见，他的好处也有相当多，例如：
 1. 他开辟了新的作用域，可以获取到外部函数和变量，而外部却无法访问到闭包内部的作用域内容，减少了代码变量冲突等问题。
@@ -141,8 +141,59 @@ function f1(){
 f1()
 ```
 ## 柯里化函数
-## 惰性函数
 
+## 防抖
+## 节流
+## 类型判断
+## proxy
+
+## compose
+假设现有多个函数，上一个执行的函数的结果需要传递到下一个函数进行加工后再次返回到下一个函数，以此类推。
+```js
+function toLowerCase(arg){
+    return String.prototype.toLowerCase.call(arg);
+}
+function startWithA(arg){
+    return `A+${arg}`
+}
+function endWithZ(arg){
+    return `${arg}+B`
+}
+function others(arg){
+    return arg+"xxxxx"
+}
+//首先会想到的做法是：
+toLowerCase(startWithA(endWithZ(others('begin'))))
+```
+总觉得这种在写法上复杂且可阅读性不好，在redux源码中看到了compose方法，很大的程度上增强了代码的可读性。
+```js
+function toLowerCase(arg){
+    return String.prototype.toLowerCase.call(arg);
+}
+function startWithA(arg){
+    return `A+${arg}`
+}
+function endWithZ(arg){
+    return `${arg}+B`
+}
+function others(arg){
+    return arg+"xxxxx"
+}
+var compose=function(...fns){//使用fns接收函数传递的需要依次执行的函数
+    return function(initArg){//initArg接收传递的BEGIN
+       return fns.reduce((prev,next)=>{//reduce函数传入初始值,返回最终执行后的结果
+            return next(prev)//每次返回的参数为prev，next为每次遍历的函数，故使用next传递prev并执行
+        },initArg)
+    }
+}
+//使用箭头函数进行简化后
+//reduce默认从做到右遍历
+var compose=(...fns)=>(initArg)=>fns.reduce((prev,next)=>next(prev),initArg);
+//使用reduceRight 从右至左一次执行。
+var composeRight=(...fns)=>(initArg)=>fns.reduceRigth((prev,next)=>next(prev),initArg);
+var res=compose(toLowerCase,others,startWithA,endWithZ)('BEGIN')//"A+beginxxxxx+B"
+var resRight=composeRight(toLowerCase,others,startWithA,endWithZ)('BEGIN')//"a+begin+bxxxxx"
+```
 ## 数组常用方法重写
 个人觉得只有重写了该方法API，并实现其一样的功能才算是彻底的了解了该API的真正含义。语言解释上也都是从个人的角度出发，所以有些语言上并不是很官方。重写并没有对参数做判断，默认传递符合的参数。
 *** 

@@ -17,6 +17,7 @@
 * [冴羽的博客](https://github.com/mqyqingfeng/Blog)
 * [剖析Vue实现原理 - 如何实现双向绑定mvvm](https://github.com/DMQ/mvvm)
 * [这里是写博客以及记录学习的地方](https://github.com/KieSun/Dream)
+* [undersercore源码分析](https://yoyoyohamapi.gitbooks.io/undersercore-analysis/content/)
 * 其它优秀的资源欢迎大家补充
 ---
 > 最后，感谢爱学习的你花时间阅读本文档！希望能给你带来更多不一样的知识和认识，别忘了点个赞再走。
