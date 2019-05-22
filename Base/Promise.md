@@ -96,7 +96,7 @@ test.then(res=>{
 //仅输出1
 ```
 ## Async await
-层次深的promise感觉还是有点深层嵌套的感觉，一层套一层，直到async await 的出现使js的异步更加易于书写，便于理解。只要在函数定义前加一个async关键词，说明该函数是一个异步函数，在定义异步变量前添加await，在此之后所有对该变量的引用都将等待所有异步获取的变量成功的reject后。与Promise.all相似，运行时间取决于最长的异步的时间，要求更高的性能的话只能使用单独的promise进行异步流程控制。
+层次深的promise感觉还是有点深层嵌套的感觉，一层套一层，直到ES8的 async await 的出现使js的异步更加易于书写，便于理解。只要在函数定义前加一个async关键词，说明该函数是一个异步函数，在定义异步变量前添加await，在此之后所有对该变量的引用都将等待所有异步获取的变量成功的reslove后。与Promise.all相似，运行时间取决于最长的异步的时间，要求更高的性能的话只能使用单独的promise进行异步流程控制。
 ```js
 promise1=new Promise((reslove,reject)=>{
     setTimeout(()=>{

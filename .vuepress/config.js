@@ -13,8 +13,9 @@ module.exports = {
             children: [
               '/Base/JS',
               '/Base/CSS',
+              '/Base/ES6',
+              '/Base/CMDAMD',
               '/Base/NODE',
-              '/Base/JSApi',
               '/Base/Promise',
               '/Base/Render',
               '/Base/Git',
