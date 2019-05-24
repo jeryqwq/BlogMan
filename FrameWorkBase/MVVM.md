@@ -3,15 +3,15 @@ title: MVVM响应式原理(指令、数据劫持、模板编译)
 lang: en-US
 ---
 ## 实现mini MVVM
-借由官网的图来解释MVVM如何实现数据层和DOM层进行数据绑定，在读懂本文前，你需要了解发布订阅模式，原生JS相关DOM操作API，ES6常用语法，闭包的理解等。
+借由官网的图来解释MVVM如何实现数据层和DOM层进行数据绑定，视图层和数据层绑定，当数据层数据改变时，自动触发视图层渲染数据，让开发者更专注于业务，而不是频繁的DOM操作。在读懂本文前，你需要了解发布订阅模式，原生JS相关DOM操作API，ES6常用语法，闭包的理解等。
 <img :src="$withBase('./../imgs/mvvm.png')" alt="MVVM">
 初始化MVVM对象编译模板，解析指令，根据指令进行不同的处理，在解析指令时遇到指令或{{}}符号时说明该Dom是要动态渲染的，故实例化一个监听者（Watcher），先渲染初始化参数，传入指令对应的需要数据绑定的参数(v-modal = "data.a")，此时传入data.a和一个callBack函数，callBack函数一般用来存储更新对应视图的代码，这样Watcher就能通过数据拿到最新的值去重新局部更新视图，说到这里，那么如何在数据发生改变的时候去通知监听者触发callBack函数进行试图重新更新呢，vue使用defineProperty对数据进行劫持，重写对象的get,set函数，达到每次改变数据时触发监听者渲染最新的数据。
 <img src="https://cn.vuejs.org/images/data.png">
 ## 文件结构
 * MVVM.js 获取初始化参数数据并分发到对应功能类处理对应的参数
 * Compile.js 编译模板，解析指令，渲染初始化参数
-* Observe.js 基于defineProperty对参数内的data进行深度劫持，为每一个对象都设置一个get和set方法
-* Watch.js 监听者，获取函数最新的值并局部更新Dom。
+* Observe.js 数据劫持：基于defineProperty对参数内的data进行深度劫持，为每一个对象都设置一个get和set方法
+* Watch.js 监听:，获取函数最新的值并局部更新Dom。依赖收集：为每个数据存入与该数据有依赖关系需要更新的DOM的函数，数据改变时利用发布订阅模式触发其更新视图层。
 ## 效果图
 <br>
 <img :src="$withBase('./../imgs/test.gif')" alt="MVVM">

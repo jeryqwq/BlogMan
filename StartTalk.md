@@ -14,10 +14,12 @@
 项目都是前后端分离，个人认为在一定程度上很大的锻炼了自己的开发水平，各种花式传值，文件，和图片文件处理等，也对前后端对接有了一定的认识和实践。
 ### 推荐资源
 * [掘金前端专区：各种新知识，新玩法，热爱分享的大佬们的聚集地](https://juejin.im/welcome/frontend)
+* [前端进阶，工作日每日前端一题](https://github.com/Advanced-Frontend/Daily-Interview-Question)
 * [冴羽的博客](https://github.com/mqyqingfeng/Blog)
 * [剖析Vue实现原理 - 如何实现双向绑定mvvm](https://github.com/DMQ/mvvm)
 * [这里是写博客以及记录学习的地方](https://github.com/KieSun/Dream)
-* [undersercore源码分析](https://yoyoyohamapi.gitbooks.io/undersercore-analysis/content/)
+* [undersercore源码分析](https://yoyoyohamapi.gitbooks.io/undersercore-analysis/
+content/)
 
 * 其它优秀的资源欢迎大家补充
 ---

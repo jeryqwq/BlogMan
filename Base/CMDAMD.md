@@ -3,7 +3,7 @@ title: CMD | AMD 规范
 lang: en-US
 ---
 ## 简介
-AMD和CMD规范都是前端模块化的规范，以往的前端开发方式都是按照文件去分类，并没有像是一些后端语言那样按照文件分类模块化开发，直到node的问世，由于其大量的要与系统底层做交互，开始出现了基于js的模块化开发概念，开始像java那样导入导出模块，由于CMD规范是同步的，node.js从硬盘加载脚本，使用CMD规范并没有多大影响，而在前端浏览器环境下，同步就意味着阻塞，每次加载脚本需要依次的加载所有代码，所以极大的受到网络的限制，从而诞生了适合浏览器环境的AMD。
+AMD和CMD规范都是前端模块化的规范，以往的前端开发方式都是按照文件去分类，且暴露全局变量，并没有像是一些后端语言那样按照模块分类去开发，不同模块内变量不冲突，直到node的问世，由于其大量的要与系统底层做交互，开始出现了基于js的模块化开发概念，开始像java那样导入导出模块，由于CMD规范是同步的，node.js从硬盘加载脚本，使用CMD规范并没有多大影响，而在前端浏览器环境下，同步就意味着阻塞，每次加载脚本需要依次的加载所有代码，所以极大的受到网络的限制，从而诞生了适合浏览器环境的AMD。
 ## CMD规范
 ### 导出
 ```js
@@ -51,14 +51,16 @@ module.exports = exports = function Constructor() {
 ```
 CMD规范更像是一个闭包然后传递一个全局的module对象去挂载上去。
 ```js
-var module={
-    exports:{}
-}
-(function(module,exports){
-    exports.a=function(i){console.log(i)}
-})(module,module.exports)
-module.exports.a()
+var module={};
+(function(module){
+    module.add=function(n)
+    {return n+1}
+})(module);
+module.exports=module;
+module.exports.add(1);
 ```
-## 总结
+## CMD总结
 * CMD规范内的模块每个模块都是一个局部作用域，对全局无影响，该作用域内的变量和函数与其他外部的无任何冲突。
-* CMD执行顺序是同步的，
+* CMD执行顺序是同步的，导入的时候就是把代码从上而下依次执行，将被导入文件的代码全部执行后存入exports导出的堆内存
+* 多次加载同一个模块只有在第一次的时候才会运行，其他时候加载则是从缓存中读取数据，想要模块重新加载必须重新清空缓存。
+## AMD规范
