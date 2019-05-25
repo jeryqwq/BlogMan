@@ -14,7 +14,7 @@ lang: en-US
 从刚学前端的那会，记得那时候的异步控制还是使用callBack来控制，个人觉得callBack也挺好用的，也不会说什么存在什么回调地狱这种情况，可能是没有处理一些复杂的业务吧，直到后来promise，async await此处跳过中间还有个es7的叫什么名字忘记了，最后async await的问世才被成为js异步的终结者，大家开始使用这种方法来处理异步，前端感觉没怎么用到，koa、egg和express等后端框架中，async几乎成为各大node后端框架的标配。
 ### callBack
 ```js
-function cbFn(option,cb){
+function cbFn(option,cb){//函数传递一个对函数的引用，执行时对该函数进行调用
     setTimeout(()=>{
         cb(123);
     },2000)
@@ -183,7 +183,436 @@ test();
 * process.nextTick:优先于其他的异步操作。主任务队列之后，其他任务之前执行，例如做一些初始化并不影响系统服务正常开启的功能代码时。
 
 ## 执行顺序
-在挂起任务时，JS 引擎会将所有任务按照类别分到这两个队列中，首先在 macrotask（宏任务） 的队列中取出第一个任务，执行完毕后取出 microtask（微任务）队列中的所有任务顺序执行；之后再取 macrotask 任务，周而复始，直至两个队列的任务都取完。执行顺序：同步任务=>异步任务=>宏任务=>微任务
+---
+> 执行顺序：同步任务=>异步任务=>宏任务=>微任务
+---
+在挂起任务时，JS 引擎会将所有任务按照类别分到这两个队列中，首先在 macrotask（宏任务） 的队列中取出第一个任务，执行完毕后取出 microtask（微任务）队列中的所有任务顺序执行；之后再取 macrotask 任务，周而复始，直至两个队列的任务都取完。
 
 ## 手写一个Promise
-### Promise A+规范
+### Promise 规范
+* Promise有三种状态。
+* 执行中遇到错误执行then回调中的第二个rejectCallBack传递错误参数。
+* 成功后接收到参数立刻执行then,且状态需要从pedding到fulfilled。
+* 失败后立刻条装到catch方法，且状态需要从pedding到rejectd。
+* reslove和reject仅能执行一个，永远执行先执行的一个。
+* then方法接收resloveCallBack和rejectCallBack。
+* 有一个全局的catch捕捉异常错误并处理。
+* ...
+* [更多规范请查看官网](https://promisesaplus.com/)
+### 同步Promise
+基于Promise的基本思想，我们先把一个同步的且支持then，catch调用的Promise写出来。
+
+```js
+class Promise{
+    constructor(fn){
+        this.status=['pedding','fulfilled','rejectd'];
+        this.reslove=(res)=>{
+            this.res=res;
+            this.curStatus=this.status[1];
+        }
+        this.reject=(err)=>{
+            this.err=err;
+            this.curStatus=this.status[2];
+        }
+        try {
+            fn(this.reslove,this.reject);
+        } catch (error) {
+            this.curStatus=this.status[2];
+            this.catch(error);
+        }
+        this.curStatus=this.status[0];
+    }
+    then(fn){
+      fn(this.res);
+    }
+    catch(fn){
+        fn(this.err);
+    }
+}
+new Promise((reslove,reject)=>{
+    reslove(100)
+}).then((res)=>{
+    console.log(res);//100 
+})
+```
+此时，如果reslove是异步时，会打印undefined，因为then函数时立刻执行，就是说，他是同步的。只有执行reslove或者reject时他才会调用then或者catch中的方法，我们再做如下修改：
+```js
+class Promise{
+    constructor(fn){
+        this.status=['padding','fulfilled','rejectd'];
+        this.fn=undefined;
+        this.curStatus=this.status[0];
+        this.reslove=(res)=>{
+            this.value=res;
+            this.curStatus=this.status[1];
+            this.then(this.fn);//执行reslove时代表参数已经获取到了，调用then方法执行
+        }
+        this.reject=(err)=>{
+            this.value=err;
+            this.curStatus=this.status[2];//执行reject时代表参数已经获取到了，调用then方法执行
+        }
+        try {
+            fn(this.reslove,this.reject);
+        } catch (error) {
+            this.curStatus=this.status[2];
+            this.catch(error);
+        }
+    }
+    then(fn){
+     this.fn=fn;
+     this.curStatus===this.status[1]?fn(this.value):undefined
+    }
+    catch(fn){
+        this.fn=fn;
+        this.curStatus===this.status[2]?fn(this.value):undefined
+    }
+}
+new Promise((reslove,reject)=>{
+    setTimeout(() => {
+        reslove(100)
+    }, 1000);
+}).then((res)=>{
+    console.log(res)//一秒后输出 100
+})
+```
+then中要传递两个回调，第一个默认成功的回调，第二个时失败的回调，且进行错误捕获，发生异常立即执行catch，再次对代码优化：
+```js
+class Promise{
+    constructor(fn){
+        this.status=['padding','fulfilled','rejectd'];
+        this.resloveCallBack=undefined;
+        this.rejectCallBack=undefined;
+        this.value=undefined;
+        this.curStatus=this.status[0];
+        this.reslove=(res)=>{
+            if(this.curStatus!==this.status[0])return;
+            this.value=res;
+            this.curStatus=this.status[1];
+            this.then(this.resloveCallBack,undefined);
+        }
+        this.reject=(err)=>{
+            if(this.curStatus!==this.status[0])return;
+            this.value=err;
+            this.curStatus=this.status[2];
+            this.then(undefined,this.rejectCallBack);
+        }
+        try {
+            fn(this.reslove,this.reject);//捕捉错误到catch中
+        } catch (error) {
+            this.reject(error);
+        }
+    }
+    then(resloveCallBack,rejectCallBack){
+        resloveCallBack?this.resloveCallBack=resloveCallBack:undefined;
+        rejectCallBack?this.rejectCallBack=rejectCallBack:undefined;
+        const that=this;
+        if(this.curStatus===this.status[1]){
+            setTimeout(() => {
+                that.resloveCallBack(that.value)
+            }, 0);
+        }
+        if(this.curStatus===this.status[2]){
+            setTimeout(() => {
+                that.rejectCallBack(that.value);
+            }, 0);
+        }
+    }
+    catch(fn){
+    this.fn=fn;
+    this.value?fn(this.value):undefined;
+    }
+}
+new Promise((reslove,reject)=>{
+    throw new Error('手动抛出错误')
+    setTimeout(() => {
+        reject(100);
+        reslove(200);
+    }, 1000);
+}).then((res)=>{
+    console.log(`res${res}`);
+},(err)=>{
+    console.log(`err${err}` );
+})
+```
+## 添加支持链式回调
+一个于原生Promise一样的的Promise简单实现了，接下来看看链式回调，在JQ中通过return this来实现链式，无论使用什么方式，返回的只要是类似自身或者自身的实例有关的对象，即可实现链式调用的效果。
+```js
+class Promise {
+    constructor(fn) {
+        this.fn = fn;
+        this.status = ['padding', 'fulfilled', 'rejectd'];
+        this.resloveCallBacks = [];
+        this.rejectCallBacks = [];
+        this.value = undefined;
+        this.curStatus = this.status[0];
+        this.reslove = (res) => {
+            if (this.curStatus !== this.status[0]) return;
+            this.value = res;
+            this.curStatus = this.status[1];
+            this.then();
+        }
+        this.reject = (err) => {
+            if (this.curStatus !== this.status[0]) return;
+            this.value = err;
+            this.curStatus = this.status[2];
+            this.then();
+        }
+        try {
+            fn(this.reslove, this.reject); //捕捉错误到catch中
+        } catch (error) {
+            this.reject(error);
+        }
+    }
+    then(resloveCallBack, rejectCallBack) {
+        const that = this;
+        if (this.curStatus === this.status[1]) {
+            setTimeout(() => {
+                that.resloveCallBacks.forEach(element => {
+                    element(that.value)
+                });
+            }, 0);
+        }
+        if (this.curStatus === this.status[2]) {
+            setTimeout(() => {
+                that.rejectCallBacks.forEach(element => {
+                    element(that.value)
+                });
+            }, 0);
+        }
+        return new Promise((reslove, reject) => {
+            //第一次 this指向p1，第二次p2，一次类推
+            this.resloveCallBacks.push(() => {
+                try {
+                    let res;
+                    typeof resloveCallBack === 'function' ? res = resloveCallBack(this.value) : res = undefined;
+                    if (res instanceof Promise) {
+                        res.then(reslove, reject);
+                        return;
+                    } else {
+                        res ? reslove(res) : undefined;
+                    }
+                } catch (error) {
+                    reject(error);
+                }
+            })
+            this.rejectCallBacks.push(() => {
+                try {
+                    let res;
+                    typeof rejectCallBack === 'function' ? res = rejectCallBack(this.value) : res = undefined;
+                    if (res instanceof Promise) {
+                        res.then(reslove, reject);
+                        return;
+                    } else {
+                        res ? reject(res) : undefined;
+                    }
+
+                } catch (error) {
+                    reject(error);
+                }
+            })
+        })
+
+    }
+
+}
+var p1 = new Promise((reslove, reject) => {
+    setTimeout(() => {
+        reslove(200);
+    }, 1000);
+});
+var p2 = p1.then((res) => {
+    console.log(`res${res}`);
+    return new Promise((reslove, reject) => {
+        setTimeout(() => {
+            reslove(100)
+        }, 2000);
+    })
+}, (err) => {})
+let p3 = p2.then((res) => {
+    console.log(res + 'second');
+    return 50
+}, err => {
+
+})
+p3.then((res) => {
+    console.log(res + '第三次P3')
+})
+//输出
+// res200  一秒后
+// 100second 三秒后输出
+// 50第三次P3 三秒后输出
+```
+使用原生Promise测试结果：
+```js
+var p1 = new Promise((reslove, reject) => {
+    setTimeout(() => {
+        reslove(200);
+    }, 1000);
+});
+var p2 = p1.then((res) => {
+    console.log(`res${res}`);
+    return new Promise((reslove, reject) => {
+        setTimeout(() => {
+            reslove(100)
+        }, 2000);
+    })
+}, (err) => {})
+let p3 = p2.then((res) => {
+    console.log(res + 'second');
+    return 50
+}, err => {
+
+})
+p3.then((res) => {
+    console.log(res + '第三次P3')
+})
+//输出
+// res200  一秒后
+// 100second 三秒后输出
+// 50第三次P3 三秒后输出
+```
+## Promise.All实现
+具体用法在上面已经讲过了，直接进入实现,先测试有错误的情况
+```js
+class Promise {
+    constructor(fn) {
+        this.fn = fn;
+        this.status = ['padding', 'fulfilled', 'rejectd'];
+        this.resloveCallBacks = [];
+        this.rejectCallBacks = [];
+        this.value = undefined;
+        this.curStatus = this.status[0];
+        this.reslove = (res) => {
+            if (this.curStatus !== this.status[0]) return;
+            this.value = res;
+            this.curStatus = this.status[1];
+            this.then();
+        }
+        this.reject = (err) => {
+            if (this.curStatus !== this.status[0]) return;
+            this.value = err;
+            this.curStatus = this.status[2];
+            this.then();
+        }
+        try {
+            fn(this.reslove, this.reject); //捕捉错误到catch中
+        } catch (error) {
+            this.catch?this.catch(error): this.reject(error);
+        }
+    }
+    then(resloveCallBack, rejectCallBack) {
+        const that = this;
+        if (this.curStatus === this.status[1]) {
+            setTimeout(() => {
+                that.resloveCallBacks.forEach(element => {
+                    element(that.value)
+                });
+            }, 0);
+        }
+        if (this.curStatus === this.status[2]) {
+            setTimeout(() => {
+                that.rejectCallBacks.forEach(element => {
+                    element(that.value)
+                });
+            }, 0);
+        }
+        return new Promise((reslove, reject) => {
+            this.resloveCallBacks.push(() => {
+                try {
+                    let res;
+                    typeof resloveCallBack === 'function' ? res = resloveCallBack(this.value) : resloveCallBack=result=>result;
+                    if (res instanceof Promise) {
+                        res.then(reslove, reject);
+                        return;
+                    } else {
+                        res ? reslove(res) : undefined;
+                    }
+                } catch (error) {
+                    reject(error);
+                }
+            })
+            this.rejectCallBacks.push(() => {
+                try {
+                    let res;
+                    typeof rejectCallBack === 'function' ? res = rejectCallBack(this.value) : res = undefined;
+                    if (res instanceof Promise) {
+                        res.then(reslove, reject);
+                        return;
+                    } else {
+                        res ? reject(res) : undefined;
+                    }
+
+                } catch (error) {
+                    reject(error);
+                }
+            })
+        })
+    }
+    catch (msg) {
+        this.reject(msg);
+    }
+    static All(argArr=[]){//ES6 语法，通过Promise.All调用
+        let resultArr=[];//存储reslove的答案
+        return new Promise((reslove,reject)=>{//Promise.All 也是then调用，故返回的也是Promise
+            argArr.forEach((promise,index)=>{//遍历Promise数组
+                promise.then(res=>{//得到每个reslove的结果
+                    resultArr[index]=res;//注：这里不能使用push，异步操作无法保证先后，push默认在最后push，会导致顺序错乱
+                    if(resultArr.length-1===index){//执行到这里就保证已经到最后一个且没有rejected
+                        reslove(resultArr);//返回成功并传递参数
+                    }
+                },err=>{
+                    reject(err);//任何一个错误直接中断
+                })
+            })
+        })
+    }
+}
+var p1 = new Promise((reslove, reject) => {
+    setTimeout(() => {
+        reslove(100);
+    }, 1000);
+});
+var p2 = new Promise((reslove, reject) => {
+    throw new Error('手动抛出')//这里有手动抛出错误
+    setTimeout(() => {
+        reslove(200);
+    }, 1000);
+});
+var p3= new Promise((reslove, reject) => {
+    setTimeout(() => {
+        reslove(300);
+    }, 1000);
+});
+Promise.All([p1,p2,p3]).then(res=>{
+    console.log(res)
+},(err)=>{
+    console.log('捕捉到:'+err)
+})
+// 捕捉到:Error: 手动抛出  
+```
+再试试数组异步返回reslove的情况：
+```js
+//省略原Promise代码
+var p1 = new Promise((reslove, reject) => {
+    setTimeout(() => {
+        reslove(100);
+    }, 1000);
+});
+var p2 = new Promise((reslove, reject) => {
+    throw new Error('手动抛出')
+    setTimeout(() => {
+        reslove(200);
+    }, 1000);
+});
+var p3= new Promise((reslove, reject) => {
+    setTimeout(() => {
+        reslove(300);
+    }, 1000);
+});
+Promise.All([p1,p2,p3]).then(res=>{
+    console.log(res)
+},(err)=>{
+    console.log('捕捉到:'+err)
+})
+//[ 100, 200, 300 ]   一秒后输出
+```
