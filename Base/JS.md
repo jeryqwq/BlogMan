@@ -66,6 +66,34 @@ fn1();//DJ
 
 ```
 ##  原型链
+* 所有的函数数据类型都有一个属性：prototype，这是一个对象，浏览器会默认给他开辟一个堆内存。(用来存储一些公共的属性或者方法提供给实例调用)
+* 在开辟的内存中，有一个自带的constaructor属性，存储当前属性本身。Array.prototype.constructor===Array //true
+* 每一个对象都有一个__protot__属性，指向当前实例所属类的prototype，如果不能确定是谁的，都是Object的实例
+### 原型链机制
+每个对象都有一个__proto__属性，指向该对象的原型,即p1__proto__===Person.prototype表达式成立
+```js
+var Person=function(){
+    this.say=function(){
+        console.log('saying...')
+    }
+    this.eat=function(){
+        console.log('eating...')
+    }
+}
+Person.prototype.name="Person"
+var p1=new Person();
+var p2=new Person();
+p1.__proto__===Person.prototype; //true 实例的__proto__指向该对象的原型
+p1.__proto__.constructor===Person //true 实例的原型上的构造函数指向父类
+Person.__proto__.constructor===Function //true Person的原型上的构造函数指向Function，String,Array,RegExp等均指向Function
+p1.name===p2.__proto__.name//true 都是查找到原型上的name属性  查找顺序为
+// p1.name=>p1.__proto__.name(已找到)=>p1.__proto__.__proto__.name   
+//即：p1.name=>Person.prototype.name=>Object.prototype.name
+Object.hasOwnProperty===p1.hasOwnProperty //true  此处都是为Object原型上的属性
+p1.say===p2.say//false  this指向两个不同的函数
+```
+搞不懂为什么p1__proto__会等于Person.prototype,p1__proto__.constructor会等于Person,而Person.prototype.constructor会等于Person,实例没有prototype属性，所以只能使用__proto__访问原型？
+
 ## 对象拷贝
 ## 闭包
 闭包在应用中非常常见，他的好处也有相当多，例如：
@@ -145,6 +173,11 @@ f1()
 ## 防抖
 ## 节流
 ## 类型判断
+类型判断一直是JS的迷，各种判断命令总是会在一些特定的情况下出现预料之外的情况，总结下常规的typeof,instanceof,Object.prototype.toString.call,--proto--.constructor===目标类型
+1. typeof
+```
+
+```
 ## proxy
 
 ## compose
