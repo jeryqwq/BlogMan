@@ -1,5 +1,5 @@
 ---
-title: MVVM响应式原理(指令、数据劫持、模板编译)
+title: MVVM响应式原理
 lang: en-US
 ---
 ## 实现mini MVVM

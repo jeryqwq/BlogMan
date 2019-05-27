@@ -34,9 +34,10 @@ module.exports = {
           {
             title: '框架',
             children: [
+              '/FrameWork/Typescript',
                 '/FrameWork/Vue',
                 '/FrameWork/React',
-                '/FrameWork/Koa',
+                '/FrameWork/Koa'
             ]
           },
           {
