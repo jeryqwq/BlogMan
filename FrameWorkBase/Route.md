@@ -3,9 +3,21 @@ title: 路由
 lang: en-US
 ---
 ## SPA
+SPA俗称单页面应用，基于整个应用只有一个页面，通过浏览器的url来进行判断该展示那些DOM元素，很大程度上增加了用户体验，所有数据都是加载好的(最近流行的代码切割除外，异步加载组件)。相比以往的多页面应用，页面与页面之间没有联系，无法保存状态，页面跳转后很难保存自身的状态，单页面应用刚好与之相反，组件与组件之间可以互相通信，融入状态管理思想，复杂的应用也可以优雅的书写代码。
+### 好处
+* 由于避免了页面的重新加载，SPA可以提供较为流畅的用户体验。得益于Ajax，可以实现无跳转刷新，由于与浏览器的history机制，可以使用hash的b变化从而可以实现推动界面变化。
+* 基于原有的html,css,js技术体系，配合组件化开发框架和对应的router能够很好的驾驭SPA单页面应用。
+* 页面切换不清空状态。
+### 缺点
+* 不利于SEO优化，单页面应用想做SEO需要做很多处理。
+* 更加方便了爬虫，SPA单页面都是使用Ajax，通过接口调用获取数据，很大程度上降低了爬虫的难度。
+
+
 ## SPA原理
+### Hash
+### History
 ## 手写简易react-router 
-本文仅实现react-router大概API和功能，仅仅用来讲解官方的React-route的实现原理，并没有实现一个一模一样的功能，在看懂本文之前，你需要有基本对react的了解，了解API---[context](https://jeryqwq.github.io/React.html#context)、[props.children](https://reactjs.org/docs/glossary.html#propschildren)、[AMD](https://jeryqwq.github.io/Base/CMDAMD.html#cmd规范)
+本文仅实现react-router大概API和功能，仅仅用来讲解官方的React-route的实现原理，并没有实现一个一模一样的功能，在看懂本文之前，你需要有基本对react的了解，了解API---[context](https://jeryqwq.github.io/React.html#context)、[props.children](https://reactjs.org/docs/glossary.html#propschildren)、[AMD规范](https://jeryqwq.github.io/Base/CMDAMD.html#cmd规范)
 
 >使用官方的creact-react-app进行构建<br/>
 ---
@@ -15,6 +27,7 @@ lang: en-US
 * component：该路由对应渲染的组件
 * exact：是否仅匹配一个
 * [更多可查看react-router文档](https://reacttraining.com/react-router/web/guides/quick-start)
+先看看官方的React-route的用法：
 ```js
 import React from 'react';
 import {HashRouter as Router,Route} from 'react-router-dom'
