@@ -28,7 +28,7 @@ module.exports = {
                 '/FrameWorkBase/VisualDom',
                 '/FrameWorkBase/DomDiff',
                 '/FrameWorkBase/Route',
-                '/FrameWorkBase/PublicData',
+                '/FrameWorkBase/PublicState',
             ]
           },
           {

@@ -169,14 +169,77 @@ function f1(){
 f1()
 ```
 ## 柯里化函数
-
 ## 防抖
 ## 节流
-## 类型判断
+## 浅谈类型判断
 类型判断一直是JS的迷，各种判断命令总是会在一些特定的情况下出现预料之外的情况，总结下常规的typeof,instanceof,Object.prototype.toString.call,--proto--.constructor===目标类型
-1. typeof
+1. typeof：使用typeof常用来判断一些简单的类型判断，例如String，Number等，返回该对象类型的小写字符串，但是使用typeof来复杂类型时，typeof并不能很准确的判断出一个对象的类型
+```js
+typeof []   //"object"
+typeof {}//"object"
+typeof null//"object"
+typeof RegExp//"function"
+typeof  function(){}//"function"
+typeof 1//"number"
+typeof ''//"string"
+typeof undefined//"undefined"
 ```
-
+2. instanceof：主要用于判断是否是该对象的实例对象,可判断复杂对象，例如数组，函数等，但是使用字面量的方式创建的基本对象(number,string)对象并不能准确的判断其类型
+```js
+123 instanceof Number //false
+new Number(1) instanceof Number //true
+'' instanceof  String//false
+new String(123) instanceof String //true
+[] instanceof  Array//true
+RegExp instanceof  Function//true
+Object instanceof Object //true
+```
+3. Object.prototype.toString.call：调用原型上的toStirng方法对该对象进行判断，然后对返回字符串做截取处理，能很精确的判断对象的具体的类型。
+```js
+Object.prototype.toString.call(1)//"[object Number]"
+Object.prototype.toString.call('')//"[object String]"
+Object.prototype.toString.call({})//"[object Object]"
+Object.prototype.toString.call([])//"[object Array]"
+Object.prototype.toString.call(function(){})//"[object Function]"
+Object.prototype.toString.call(null)//"[object Null]"
+Object.prototype.toString.call(undefined)//"[object Undefined]"
+//封装函数后如下：
+function getType(val){
+    var longRes=Object.prototype.toString.call(val);
+    return longRes.slice(8,longRes.length-1);
+}
+getType(1);//"Number"
+getType('');//"String"
+getType([]);//Array
+getType(function(){});//Function
+getType(null);//Null
+getType(undefined);//Undefined
+getType(/\//);//"RegExp"
+getType(RegExp);//"Function"
+```
+4. 你以为这已经准确了吗? 当判断实例对象的时候，使用以上方法都不能很好的判断该实例的父类，而我们自己创造的对象，我们也希望能够像上述判断一样能够知晓是否是该对象。
+```js
+function getType(val){
+    var longRes=Object.prototype.toString.call(val);
+    return longRes.slice(8,longRes.length-1);
+}
+var Person=function(){};//父类
+var p1=new Person();//实例化一个子类
+getType(p1);//"Object"
+p1 instanceof Person;//true
+typeof p1;//"object"
+```
+在[原型链中](https://jeryqwq.github.io/Base/JS.html#%E5%8E%9F%E5%9E%8B%E9%93%BE)，每个新开辟的实例都有一个自带的constaructor属性，存储当前属性本身，即Array.prototype.constructor===Array是成立的，每次实例化对象的__proto__的指向该对象的原型，所以[].__proto__.constructor===Array也是成立的，所以从对象的原型上下手查找该对象的名称。
+```js
+function getType(val){
+    return val['__proto__']['constructor']['name'];
+}
+getType(1)//"Number"
+getType('')//"String"
+getType([])//"Array"
+getType(RegExp)//"Function"
+getType(/\//);//"RegExp"
+getType(p1);//"Person"
 ```
 ## proxy
 
