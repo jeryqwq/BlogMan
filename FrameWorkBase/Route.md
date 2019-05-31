@@ -16,7 +16,12 @@ SPA俗称单页面应用，基于整个应用只有一个页面，通过浏览�
 ## SPA原理
 ### Hash
 ### History
-## 手写简易react-router 
+## 动手实现react-router 
+### 效果预览
+<br/>
+
+<img :src="$withBase('./../imgs/react-route.gif')" alt="redux效果预览图">
+
 本文仅实现react-router大概API和功能，仅仅用来讲解官方的React-route的实现原理，并没有实现一个一模一样的功能，在看懂本文之前，你需要有基本对react的了解，了解API---[context](https://jeryqwq.github.io/React.html#context)、[props.children](https://reactjs.org/docs/glossary.html#propschildren)、[AMD规范](https://jeryqwq.github.io/Base/CMDAMD.html#cmd规范)
 
 >使用官方的creact-react-app进行构建<br/>
@@ -27,7 +32,13 @@ SPA俗称单页面应用，基于整个应用只有一个页面，通过浏览�
 * component：该路由对应渲染的组件
 * exact：是否仅匹配一个
 * [更多可查看react-router文档](https://reacttraining.com/react-router/web/guides/quick-start)
-先看看官方的React-route的用法：
+<br>
+先使用官方的React-route搭建单页面：<br>
+安装插件:
+```bash
+npm i react-router-dom -s
+```
+### App.js
 ```js
 import React from 'react';
 import {HashRouter as Router,Route} from 'react-router-dom'
@@ -52,17 +63,18 @@ class App extends React.Component{
   }
 }
 function Main() {//函数组件
-  return(<div>
+  return(<div style={{height:300,background:'#cbcbcb'}}>
     我是主页
   </div>)
 }
 function PageA() {
-  return(<div>
+  return(<div style={{height:300,background:'orange'}}>
     我是A页面
   </div>)
 }
-function PageB(params) {
-  return(<div>
+function PageB(props) {
+  console.log(props)//向子组件传递路由相关信息
+  return(<div style={{height:300,background:'yellow'}}>
     我是B页面
   </div>)
 }
@@ -76,13 +88,15 @@ export default App;
 >> RouteContext.js    ---创建context对象<br>
 >> index.js---组合后导出对象，方便引用<br>
 ----
-RouteContext.js ：创建路由需要传递属性的生产者和消费者
+###  RouteContext.js 
+<br>创建路由需要传递属性的生产者和消费者
 ```js
 import React from 'react';
 const {Provider,Consumer}= React.createContext();
 export {Provider,Consumer}
 ```
-HashRouter.js: 外层包裹的Router组件
+### HashRouter.js
+<br> 外层包裹的Router组件
 ```js
 import React, {Component } from 'react'
 import {Consumer,Provider} from './RouteContext'//导入生产者和消费者
@@ -122,7 +136,8 @@ class HashRouter extends Component {
  
 export default HashRouter;
 ```
-Route.js：传递path和component属性进行路由匹配后展示props的component属性并传递widnow.location属性，即Provider的value传递的属性(window.loaction)
+### Route.js
+<br>传递path和component属性进行路由匹配后展示props的component属性并传递widnow.location属性，即Provider的value传递的属性(window.loaction)
 ```js
 import  React from 'react';
 import { Consumer } from "./RouteContent";
@@ -139,7 +154,8 @@ class Route extends React.Component {
 }
 export default Route;
 ```
-index.js ：组装并导出对象
+### index.js 
+<br>组装并导出对象
 ```js
 import BrowserRouter from  "./BrowserRouter";
 import HashRouter from './HashRouter';
@@ -177,20 +193,21 @@ class App extends React.Component{
   }
 }
 function Main() {//函数组件
-  return(<div>
+  return(<div style={{height:300,background:'#cbcbcb'}}>
     我是主页
   </div>)
 }
 function PageA() {
-  return(<div>
+  return(<div style={{height:300,background:'orange'}}>
     我是A页面
   </div>)
 }
-function PageB(params) {
-  return(<div>
+function PageB(props) {
+  console.log(props)//向子组件传递路由相关信息
+  return(<div style={{height:300,background:'yellow'}}>
     我是B页面
   </div>)
 }
 export default App;
 ```
-到此，一个简易的react-router就完成了，更多功能还需完善，像是Link，Redirect,exact和路由跳转判断等
+到此，一个简易的react-router就完成了，更多功能还需完善，像是Link，Redirect,exact和路由跳转判断等可根据喜好继续实现

@@ -241,7 +241,6 @@ getType(RegExp)//"Function"
 getType(/\//);//"RegExp"
 getType(p1);//"Person"
 ```
-## proxy
 
 ## compose
 假设现有多个函数，上一个执行的函数的结果需要传递到下一个函数进行加工后再次返回到下一个函数，以此类推。
