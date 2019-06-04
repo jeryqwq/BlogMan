@@ -105,5 +105,5 @@ class Child extends React.Component {
 export default Child;
 ```
 ## 更好用的Mobx
-相比react-redux，mobx简洁的语法和神奇的
+相比react-redux，mobx简洁的语法和神奇的响应式原理
 ## 动手实现mobx

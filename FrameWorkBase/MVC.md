@@ -1,4 +1,4 @@
 ---
-title: Diff算法
+title: MVC原理
 lang: en-US
 ---

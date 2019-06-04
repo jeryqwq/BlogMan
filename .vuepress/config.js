@@ -25,6 +25,7 @@ module.exports = {
             title: '框架必知',
             children: [
                 '/FrameWorkBase/MVVM',
+                '/FrameWorkBase/MVC',
                 '/FrameWorkBase/VisualDom',
                 '/FrameWorkBase/DomDiff',
                 '/FrameWorkBase/Route',
