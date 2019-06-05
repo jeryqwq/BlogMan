@@ -92,3 +92,4 @@ function createElement(elType, attrs, children) {//对应参数：(DOM类型，�
     return el;//返回当前元素
 }
 ```
+

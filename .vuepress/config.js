@@ -4,7 +4,8 @@ module.exports = {
     themeConfig: {
         nav: [
             { text: '前端', link: '/' },
-            { text: '时间安排', link: '/guide/' },
+            { text: '时间安排', link: '/nav/Time' },
+            { text: '读书', link: '/nav/Reading' },
             { text: 'GitHub', link: 'https://github.com/jeryqwq' },
           ],
         sidebar: [

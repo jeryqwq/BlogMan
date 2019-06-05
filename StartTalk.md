@@ -19,7 +19,9 @@
 * [剖析Vue实现原理 - 如何实现双向绑定mvvm](https://github.com/DMQ/mvvm)
 * [这里是写博客以及记录学习的地方](https://github.com/KieSun/Dream)
 * [undersercore源码分析](https://yoyoyohamapi.gitbooks.io/undersercore-analysis/content/)
-
+* [前端刻意练习](https://github.com/fezaoduke/fe-practice-hard)
+* [you-need-to-know-css](https://lhammer.cn/You-need-to-know-css/#/)
+* [Vue技术内幕](http://hcysun.me/vue-design/art/)
 * 其它优秀的资源欢迎大家补充
 ---
 > 最后，感谢爱学习的你花时间阅读本文档！希望能给你带来更多不一样的认识和和进一步的理解，有任何错误欢迎指正。

@@ -7,6 +7,56 @@ lang: en-US
 ## 发布订阅
 发布订阅模式在任何框架中应用的地方很多，经典的开发思想，MVVM中用来存储更新DOM的操作，数据变更通知所有订阅者更新数据，redux中也不例外，存储有订阅的组件更新视图函数，数据变更时通知所有订阅的组件进行重新渲染(执行render函数)，通过一个第三方容器来跨组件管理状态。
 ## redux
+基于所有组件化框架的单向数据流的思想，redux规定我们每次更改数据时都应该有一个action来描述修改数据状态的原因或者动机，从而修改store中的数据，再通知每个订阅者或者组件进行更新视图。
+<br>
+<img src="https://cn.mobx.js.org/images/action-state-view.png">
+<br>
+应用中所有的 state 都以一个对象树的形式储存在一个单一的 store 中。 惟一改变 state 的办法是触发 action，一个描述发生什么的对象。 为了描述 action 如何改变 state 树，你需要编写 reducers。
+### redux示例
+抄一波[官方文档](https://cn.mobx.js.org/)的代码：
+```js
+import { createStore } from 'redux';
+
+/**
+ * 这是一个 reducer，形式为 (state, action) => state 的纯函数。
+ * 描述了 action 如何把 state 转变成下一个 state。
+ *
+ * state 的形式取决于你，可以是基本类型、数组、对象、
+ * 甚至是 Immutable.js 生成的数据结构。惟一的要点是
+ * 当 state 变化时需要返回全新的对象，而不是修改传入的参数。
+ *
+ * 下面例子使用 `switch` 语句和字符串来做判断，但你可以写帮助类(helper)
+ * 根据不同的约定（如方法映射）来判断，只要适用你的项目即可。
+ */
+function counter(state = 0, action) {
+  switch (action.type) {
+  case 'INCREMENT':
+    return state + 1;
+  case 'DECREMENT':
+    return state - 1;
+  default:
+    return state;
+  }
+}
+
+// 创建 Redux store 来存放应用的状态。
+// API 是 { subscribe, dispatch, getState }。
+let store = createStore(counter);
+
+// 可以手动订阅更新，也可以事件绑定到视图层。
+store.subscribe(() =>
+  console.log(store.getState())
+);
+
+// 改变内部 state 惟一方法是 dispatch 一个 action。
+// action 可以被序列化，用日记记录和储存下来，后期还可以以回放的方式执行
+store.dispatch({ type: 'INCREMENT' });
+// 1
+store.dispatch({ type: 'INCREMENT' });
+// 2
+store.dispatch({ type: 'DECREMENT' });
+// 1
+```
 ## 手写简易的React-Redux
 ###  效果预览
 ---
@@ -104,6 +154,61 @@ class Child extends React.Component {
 }
 export default Child;
 ```
-## 更好用的Mobx
-相比react-redux，mobx简洁的语法和神奇的响应式原理
-## 动手实现mobx
+## 更好用的MobX
+相比react-redux，mobx简洁的语法和神奇的响应式原理,相比react-redux而言项目复杂度降低了许多，在一个大型的react项目中，往往全局状态会有很多，开发者为了尽量减少手动输入字符串标识等，会把一个项目包含react-redux功能的文件拆分为reducer，action-type，action等，将每个store进行拆分为多个文件分开管理，这种开发方式并不适合一些中小型应用，繁琐复杂的定义和文件引用跳转等，直到后来使用了mobx，一个文件就对应一个state，即全局状态，action使用方法名称来定义，通过对象来调用和派发，即避免了定义常量字符串，也方便开发者使用编辑器的提示调用方法。
+## MobX用法
+* 使用前请安装mobx<br>
+Timer.js
+```js
+import {observable,action,autorun} from 'mobx';
+//observable:创建一个需要被监听的对象
+// action:定义触发数据改变函数
+// autorrun 数据更改时所执行的函数
+var appState = observable({//创建状态
+    timer: 0
+});
+appState.increment=action(function reset(){//挂载action函数
+    appState.timer++
+})
+setInterval(action(function tick() {
+    appState.timer += 1;
+}), 1000);
+autorun(function(){// 数据更改是自动执行的函数
+    console.log(appState.timer);
+})
+export default appState;
+```
+每次数据修改就会自动运行autorun内的函数并获取到最新的状态值。
+## React-MobX
+Mobx配合React,像是react-redux一样的，在数据更改时调用autorun方法去触发组件重新渲染。官方使用装饰器模式去包装React组件，被包装的组件在数据修改时可重新渲染最新的视图层数据,也可以使用observer对组件进行包装，效果一样。
+
+```js
+import React from 'react';
+import Store from './mobx/Timer'// 导入上述的Timer.js文件
+import {observer} from 'mobx-react';
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { };
+  }
+
+  render() {
+    return (
+      <div className="App">
+       {Store.timer}
+       <button onClick={()=>{
+         Store.increment()
+       }}>Increment</button>
+      </div>
+    );
+  }
+}
+
+export default observer(App);//渲染包装后的组件
+```
+mobx中state数据改变后在React组件中就能及时动态渲染最新状态了。
+## 动手实现MobX
+MobX基于ES6新增API－[Proxy](https://jeryqwq.github.io/Base/ES6.html#proxy)实现，用来对数据添加中间层代理，弥补了基于Object.definePrototype的缺陷。
+```js
+
+```
