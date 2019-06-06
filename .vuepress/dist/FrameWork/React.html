@@ -7,7 +7,7 @@
     <meta name="description" content="曾今我也以为梦想遥不可及">
     
     
-    <link rel="preload" href="/assets/css/0.styles.f080e4e2.css" as="style"><link rel="preload" href="/assets/js/app.f686fea7.js" as="script"><link rel="preload" href="/assets/js/20.c23b279c.js" as="script"><link rel="prefetch" href="/assets/js/10.d09e4c15.js"><link rel="prefetch" href="/assets/js/11.8d627567.js"><link rel="prefetch" href="/assets/js/12.5ee793a2.js"><link rel="prefetch" href="/assets/js/13.7e9eb53d.js"><link rel="prefetch" href="/assets/js/14.f01ec160.js"><link rel="prefetch" href="/assets/js/15.6febb495.js"><link rel="prefetch" href="/assets/js/16.14fe50af.js"><link rel="prefetch" href="/assets/js/17.05dd0938.js"><link rel="prefetch" href="/assets/js/18.42204178.js"><link rel="prefetch" href="/assets/js/19.dd753f61.js"><link rel="prefetch" href="/assets/js/2.66950f46.js"><link rel="prefetch" href="/assets/js/21.42dba0de.js"><link rel="prefetch" href="/assets/js/22.f8a06ca2.js"><link rel="prefetch" href="/assets/js/23.2be1a5d1.js"><link rel="prefetch" href="/assets/js/24.e4d1bab6.js"><link rel="prefetch" href="/assets/js/25.d95c4054.js"><link rel="prefetch" href="/assets/js/26.6bfba35e.js"><link rel="prefetch" href="/assets/js/27.4b650057.js"><link rel="prefetch" href="/assets/js/3.4cff24a0.js"><link rel="prefetch" href="/assets/js/4.1149acc3.js"><link rel="prefetch" href="/assets/js/5.475745fb.js"><link rel="prefetch" href="/assets/js/6.553e0de2.js"><link rel="prefetch" href="/assets/js/7.98cdd5fa.js"><link rel="prefetch" href="/assets/js/8.3f2da547.js"><link rel="prefetch" href="/assets/js/9.88339c09.js">
+    <link rel="preload" href="/assets/css/0.styles.f080e4e2.css" as="style"><link rel="preload" href="/assets/js/app.eb49919b.js" as="script"><link rel="preload" href="/assets/js/20.c50b459a.js" as="script"><link rel="prefetch" href="/assets/js/10.d09e4c15.js"><link rel="prefetch" href="/assets/js/11.8d627567.js"><link rel="prefetch" href="/assets/js/12.5ee793a2.js"><link rel="prefetch" href="/assets/js/13.7e9eb53d.js"><link rel="prefetch" href="/assets/js/14.f01ec160.js"><link rel="prefetch" href="/assets/js/15.6febb495.js"><link rel="prefetch" href="/assets/js/16.14fe50af.js"><link rel="prefetch" href="/assets/js/17.05dd0938.js"><link rel="prefetch" href="/assets/js/18.42204178.js"><link rel="prefetch" href="/assets/js/19.dd753f61.js"><link rel="prefetch" href="/assets/js/2.66950f46.js"><link rel="prefetch" href="/assets/js/21.42dba0de.js"><link rel="prefetch" href="/assets/js/22.f8a06ca2.js"><link rel="prefetch" href="/assets/js/23.2be1a5d1.js"><link rel="prefetch" href="/assets/js/24.e4d1bab6.js"><link rel="prefetch" href="/assets/js/25.d95c4054.js"><link rel="prefetch" href="/assets/js/26.6bfba35e.js"><link rel="prefetch" href="/assets/js/27.4b650057.js"><link rel="prefetch" href="/assets/js/3.4cff24a0.js"><link rel="prefetch" href="/assets/js/4.1149acc3.js"><link rel="prefetch" href="/assets/js/5.475745fb.js"><link rel="prefetch" href="/assets/js/6.553e0de2.js"><link rel="prefetch" href="/assets/js/7.98cdd5fa.js"><link rel="prefetch" href="/assets/js/8.3f2da547.js"><link rel="prefetch" href="/assets/js/9.88339c09.js">
     <link rel="stylesheet" href="/assets/css/0.styles.f080e4e2.css">
   </head>
   <body>
@@ -51,7 +51,93 @@
 <span class="token punctuation">}</span>
  
 <span class="token keyword">export</span> <span class="token keyword">default</span> HashRouter<span class="token punctuation">;</span>
-</code></pre></div><h2 id="代码切割"><a href="#代码切割" aria-hidden="true" class="header-anchor">#</a> 代码切割</h2> <h2 id="高阶组件-hoc"><a href="#高阶组件-hoc" aria-hidden="true" class="header-anchor">#</a> 高阶组件(HOC)</h2> <h2 id="hook"><a href="#hook" aria-hidden="true" class="header-anchor">#</a> Hook</h2> <h2 id="router"><a href="#router" aria-hidden="true" class="header-anchor">#</a> Router</h2></div> <div class="page-edit"><!----> <!----></div> <div class="page-nav"><p class="inner"><span class="prev">
+</code></pre></div><h2 id="代码切割"><a href="#代码切割" aria-hidden="true" class="header-anchor">#</a> 代码切割</h2> <h2 id="高阶组件-hoc"><a href="#高阶组件-hoc" aria-hidden="true" class="header-anchor">#</a> 高阶组件(HOC)</h2> <h2 id="hook"><a href="#hook" aria-hidden="true" class="header-anchor">#</a> Hook</h2> <p>React 16.8Hook的出现，官方极力推崇函数式编程，在不使用类的情况下使函数组件也有自己的state，由此新增了多个API，极大增强了函数组件。原有create-react-app 创建的项目只要将react和react-dom升级到16.8以上版本即可使用Hook特性。</p> <h3 id="usestate"><a href="#usestate" aria-hidden="true" class="header-anchor">#</a> useState</h3> <p>顾名思义，该API是函数组件最常用的，他替代了类组件的this.state,使得函数组件也有自己的状态，调用解构的第二个函数传递新参数时刷新视图。
+<br>
+一个简单的累加计数：</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">import</span> React <span class="token punctuation">,</span><span class="token punctuation">{</span>useState<span class="token punctuation">}</span><span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">function</span> <span class="token function">App</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>count<span class="token punctuation">,</span>setCount<span class="token punctuation">]</span><span class="token operator">=</span><span class="token function">useState</span><span class="token punctuation">(</span><span class="token punctuation">{</span>num<span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span>name<span class="token punctuation">:</span><span class="token string">'CJ'</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">//解构出第一个参数为对象，第二个修改参数的方法（该方法并不会像是setState那样自动合并对象</span>
+  <span class="token comment">//而是整个替换掉，所以当第一个参数为对象时，最好使用{...count,xxx:'changeObj'}</span>
+  <span class="token keyword">return</span><span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div<span class="token operator">&gt;</span>
+        <span class="token punctuation">{</span>count<span class="token punctuation">.</span>num<span class="token punctuation">}</span>
+        <span class="token operator">&lt;</span>button  onClick<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=&gt;</span><span class="token punctuation">{</span>
+          <span class="token function">setCount</span><span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token operator">...</span>count<span class="token punctuation">,</span>num<span class="token punctuation">:</span>count<span class="token punctuation">.</span>num<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token operator">&gt;</span>increment<span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">&gt;</span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">&gt;</span>
+  <span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>延迟加载:</p> <div class="language-js extra-class"><pre class="language-js"><code>  <span class="token keyword">const</span> <span class="token punctuation">[</span>count<span class="token punctuation">,</span>setCount<span class="token punctuation">]</span><span class="token operator">=</span><span class="token function">useState</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=&gt;</span><span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token function">initPams</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token comment">//调用函数初始化状态</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">function</span> <span class="token function">initPams</span><span class="token punctuation">(</span><span class="token parameter">arg</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">return</span> arg<span class="token operator">+</span><span class="token number">5</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">return</span><span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div<span class="token operator">&gt;</span>
+        <span class="token punctuation">{</span>count<span class="token punctuation">}</span>
+        <span class="token operator">&lt;</span>button  onClick<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=&gt;</span><span class="token punctuation">{</span>
+          <span class="token function">setCount</span><span class="token punctuation">(</span>count<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token operator">&gt;</span>increment<span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">&gt;</span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">&gt;</span>
+  <span class="token punctuation">)</span>
+</code></pre></div><h3 id="useeffect"><a href="#useeffect" aria-hidden="true" class="header-anchor">#</a> useEffect</h3> <p>useEffect用来监听一些非DOM渲染数据也需要进行更改时，例如document.title,window.href,或者添加监听事件等，返回事件在组件清除时对监听事件解除绑定。函数内数据每次触发一次渲染修改，会自动执行该函数。</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">import</span> React <span class="token punctuation">,</span><span class="token punctuation">{</span>useState<span class="token punctuation">,</span>useEffect<span class="token punctuation">}</span><span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>title<span class="token punctuation">,</span>setTitle<span class="token punctuation">]</span><span class="token operator">=</span><span class="token function">useState</span><span class="token punctuation">(</span><span class="token string">'is Title'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">useEffect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=&gt;</span><span class="token punctuation">{</span>
+    document<span class="token punctuation">.</span>title<span class="token operator">=</span>title<span class="token punctuation">;</span>
+    <span class="token keyword">return</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=&gt;</span><span class="token punctuation">{</span>
+      document<span class="token punctuation">.</span>title<span class="token operator">=</span><span class="token string">'React app'</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span><span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div<span class="token operator">&gt;</span>
+        <span class="token punctuation">{</span>title<span class="token punctuation">}</span>
+        <span class="token operator">&lt;</span>button  onClick<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=&gt;</span><span class="token punctuation">{</span>
+            <span class="token function">setTitle</span><span class="token punctuation">(</span>title<span class="token operator">+</span><span class="token string">'+'</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token operator">&gt;</span>AddTitle<span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">&gt;</span>
+   
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">&gt;</span>
+  <span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div><h3 id="usememo"><a href="#usememo" aria-hidden="true" class="header-anchor">#</a> useMemo</h3> <p>useMemo类似Vue中的computed，监听多个函数，在函数变动时触发指定的函数执行。在vue中只要该函数内的data变动后便会立即执行，重新渲染最新的结果，复杂的业务中，并不是所有结果都是由其本身的影响生成，亦可能是其他数据的变动改变导致重新渲染，useMemo与computed最大的差别就是是否自动检测渲染。</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">import</span> React <span class="token punctuation">,</span><span class="token punctuation">{</span>useState<span class="token punctuation">,</span>useMemo<span class="token punctuation">}</span><span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>count<span class="token punctuation">,</span>setCount<span class="token punctuation">]</span><span class="token operator">=</span><span class="token function">useState</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">useMemo</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=&gt;</span><span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>count<span class="token punctuation">)</span><span class="token comment">//此时的取值是更新之前的值</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">[</span>count<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token comment">//第二个参数决定哪些数据变动触发函数执行</span>
+  <span class="token keyword">return</span><span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div<span class="token operator">&gt;</span>
+        <span class="token punctuation">{</span>count<span class="token punctuation">}</span>
+        <span class="token operator">&lt;</span>button  onClick<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=&gt;</span><span class="token punctuation">{</span>
+            <span class="token function">setCount</span><span class="token punctuation">(</span>count<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token operator">&gt;</span>Increment<span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">&gt;</span>
+   
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">&gt;</span>
+  <span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div><h3 id="usecallback"><a href="#usecallback" aria-hidden="true" class="header-anchor">#</a> useCallBack</h3> <p>useCallBack类似于类组件每次setState完后传递的callBakc函数，用来获取最新的值，在类组件中异步改变state中的数据后必须在回调函数中才能获取最新的状态，例：</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">setState</span><span class="token punctuation">(</span><span class="token punctuation">{</span>count<span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=&gt;</span><span class="token punctuation">{</span>
+  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>count<span class="token punctuation">)</span><span class="token comment">//此时才能获取罪行的状态</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre></div><p>使用useCallBack:</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">import</span> React <span class="token punctuation">,</span><span class="token punctuation">{</span>useState<span class="token punctuation">,</span>useCallBack<span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+ <span class="token keyword">function</span> <span class="token function">App</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+      <span class="token keyword">const</span> <span class="token punctuation">[</span>count<span class="token punctuation">,</span>setCount<span class="token punctuation">]</span><span class="token operator">=</span><span class="token function">useState</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">let</span> countCb<span class="token operator">=</span><span class="token function">useCallback</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=&gt;</span><span class="token punctuation">{</span>
+      console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>count<span class="token punctuation">)</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">[</span>count<span class="token punctuation">]</span><span class="token punctuation">)</span>
+      <span class="token function">countCb</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span><span class="token punctuation">(</span>
+          <span class="token operator">&lt;</span>div<span class="token operator">&gt;</span>
+              <span class="token punctuation">{</span>count<span class="token punctuation">}</span>
+              <span class="token operator">&lt;</span>button  onClick<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=&gt;</span><span class="token punctuation">{</span>
+                  <span class="token function">setCount</span><span class="token punctuation">(</span>count<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span>
+              <span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token operator">&gt;</span>Increment<span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">&gt;</span>
+        
+          <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">&gt;</span>
+        <span class="token punctuation">)</span>
+ <span class="token punctuation">}</span>
+</code></pre></div><h2 id="router"><a href="#router" aria-hidden="true" class="header-anchor">#</a> Router</h2></div> <div class="page-edit"><!----> <!----></div> <div class="page-nav"><p class="inner"><span class="prev">
         ←
         <a href="/FrameWork/Vue.html" class="prev">
           Vue
@@ -60,6 +146,6 @@
         </a>
         →
       </span></p></div> </div> <!----></div></div>
-    <script src="/assets/js/app.f686fea7.js" defer></script><script src="/assets/js/20.c23b279c.js" defer></script>
+    <script src="/assets/js/app.eb49919b.js" defer></script><script src="/assets/js/20.c50b459a.js" defer></script>
   </body>
 </html>
