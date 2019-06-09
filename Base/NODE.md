@@ -5,7 +5,7 @@ lang: en-US
 
 ## 创建静态文件服务器
 使用node搭建一个静态文件服务器，常用的插件有live-server等，直接在对应的目录下执行live-server命令，即可在端口开启一个托管当前目录下的静态文件的端口，浏览器可通过该端口访问到该目录下的所有文件并下载。
-```bash
+``` 
 npm i live-server -g || cnpm ...||yarn add live-server -g//全局安装插件
 cd yourFilePath//进入指定目录
 live-server//开启服务

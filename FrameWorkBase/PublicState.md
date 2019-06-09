@@ -209,6 +209,86 @@ export default observer(App);//渲染包装后的组件
 mobx中state数据改变后在React组件中就能及时动态渲染最新状态了。
 ## 动手实现MobX
 MobX基于ES6新增API－[Proxy](https://jeryqwq.github.io/Base/ES6.html#proxy)实现，用来对数据添加中间层代理，弥补了基于Object.definePrototype的缺陷。
+* observable：返回被proxy代理的对象，每次触发set时调用autorun内的函数执行
+* observer：包装react组件，触发set时调用autorun执行组件更新。
+* autorun：数据改变时执行的函数。
+### 文件目录
+>mobx
+>>action.js action函数触发事件执行改变状态<br>
+>>autorun.js 数据改变时执行的函数<br>
+>>mobx-react.js 增加组件刷新功能<br>
+>>observable.js  数据增加代理<br>
+### mobx-react.js
 ```js
-
+import autorun from "./autorun";
+export default function  observer(Component) {//包装的组件增加autorun自动刷新
+    autorun( ()=> {
+        Component.prototype.componentWillMount =function () {//组件加载完成调用原型方法自动重新渲染
+            autorun(() => {
+                this.forceUpdate();
+            });
+        }
+      });
+    return Component
+}
 ```
+### observable.js
+```js
+import autorun from "./autorun";
+export default class observable{
+    constructor(target){
+        return new Proxy(target,{//返回代理后的proxy对象
+            get(target,key,val){
+                return target[key]
+            },
+            set(target,key,val){
+                if(target[key]!==val){
+                    target[key]=val;//数据更改促发autorun函数执行
+                    autorun(autorun.target)
+                    return val
+                };
+
+            }
+        })
+    }
+}
+```
+### autorun.js
+```js
+export default function  autorun(fn) {
+    if(fn){
+        autorun.target=fn;//函数赋值给target对象，proxy内可以取到
+        fn();
+    }
+}
+```
+使用react-app渲染
+```js
+import React from 'react';
+import {observer,observable} from "./mobx";
+//导入包装组件和代理
+class App extends React.Component {
+  render() {
+    return(
+      <div>
+        <h2>{store.name}</h2>
+        <SubApp/>
+        <input onChange={(event)=>{state.name=event.target.value}}/>
+      </div>
+    )
+  }
+}
+class SubApp extends React.Component {
+  render() {
+    return(
+      <div>
+        <h2>{store.name}</h2>
+      </div>
+    )
+  }
+}
+
+export default observer(App);
+//input的onchage事件改变state的数据，通知组件重新渲染。
+```
+自此，一个基本的mobx-react的功能就完成了，mobx的大致运行原理也更深入了一层。
