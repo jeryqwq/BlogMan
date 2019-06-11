@@ -26,4 +26,6 @@ var proxy = new Proxy(target,{
 });
 
 ```
+## decorator(装饰器)
+使用过JAVA应该都会了解装饰器，spring MVC中用来修饰类或者方法，@Controller|@RequestionMapper,对类或则方法功能进行增强。
 ## Babel编译
