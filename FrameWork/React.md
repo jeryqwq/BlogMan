@@ -55,6 +55,98 @@ export default HashRouter;
 ```
 ## 代码切割
 ## 高阶组件(HOC)
+高阶组件类似与高阶函数，用与对组件添加增强功能，如：操纵原组件props，增强生命周期函数，增加额外的状态,以及类似vue中的mixin组件增强，react中并没有此类API，可通过代码实现mixins功能，更多HOC高阶特性玩法还有很多。。。
+### 操纵组件props
+```js
+import React from 'react';
+import ReactDom from 'react-dom';
+class App extends React.Component{
+  render(){
+    return(
+      <div>{this.props.name}{this.props.age}</div>
+    )
+  }
+}
+function HocPropsFunc(WrapComponent){
+  let props={
+    name:'CJ',
+    age:23
+  }
+  return <WrapComponent {...props} />;//添加props给原组件使用
+}
+ReactDOM.render(
+  HocPropsFunc(App),
+  document.getElementById('root')
+);
+```
+### 再次返回类组件增强更多功能
+```js
+class App extends React.Component{
+    state={};
+    componentDidMount(){
+      console.log('didmount')
+    }
+    render(){
+      return(
+        <div>{this.props.name}</div>
+      )
+    }
+  }
+  function HOCClassFunction(WrapComponent){
+    return class extends React.Component{
+        componentDidMount(){
+            console.log("WrapComponetn init")//此处可在返回的组件中执行更多
+            //组件的操作，从而扩展更多功能
+        }
+        state={
+            name:'CJ',
+            age:23
+        }
+      render(){
+        return <WrapComponent {...this.state} />
+      }
+    }
+  }
+  ReactDOM.render(
+  HOCClassFunction(App),
+  document.getElementById('root')
+);
+```
+### 修改组件生命周期函数或修改state状态
+```js
+let ReactMinxins={//自定义mixins对象，可添加React生命周期函数或者一些辅助函数等
+    componentDidMount(){
+        console.log(" minxins COmponentWillMount");
+    }
+}
+class App extends React.Component{
+    state={};//此处必须有一个state对象，否则增强状态时报错找不到对象函数
+    componentDidMount(){
+      console.log('class didmount')//原生命周期函数
+    }
+    render(){
+      return(//显示增强后的name
+        <div>{this.state.name}</div>
+      )
+    }
+  }
+  function mixinFunction(WrapComponent){//手写基于React的mixins功能
+    let prevFn=WrapComponent.prototype.componentDidMount;//暂存componentDidMount函数
+    WrapComponent.prototype.componentDidMount=function(){//重写该函数，此处不能使用
+    //箭头函数，否则this指向mixinFunction
+      prevFn();//执行暂存的原组件的生命周期方法
+      this.setState({//像原组件添加状态
+        name:"DJ",
+        age:23
+      })
+      ReactMinxins.componentDidMount();//调用执行mixins方法
+    };
+    return WrapComponent//返回增强后组件
+  }
+    ReactDOM.render(
+    mixinFunction(App),
+  document.getElementById('root')
+```
 ## Hook
 React 16.8Hook的出现，官方极力推崇函数式编程，在不使用类的情况下使函数组件也有自己的state，由此新增了多个API，极大增强了函数组件。原有create-react-app 创建的项目只要将react和react-dom升级到16.8以上版本即可使用Hook特性。
 ### useState

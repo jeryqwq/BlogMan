@@ -7,7 +7,7 @@
     <meta name="description" content="曾今我也以为梦想遥不可及">
     
     
-    <link rel="preload" href="/assets/css/0.styles.f080e4e2.css" as="style"><link rel="preload" href="/assets/js/app.d74d1f0d.js" as="script"><link rel="preload" href="/assets/js/20.b42f3375.js" as="script"><link rel="prefetch" href="/assets/js/10.982211fa.js"><link rel="prefetch" href="/assets/js/11.7b640b98.js"><link rel="prefetch" href="/assets/js/12.86ae73d7.js"><link rel="prefetch" href="/assets/js/13.3aa6b9a4.js"><link rel="prefetch" href="/assets/js/14.896d170b.js"><link rel="prefetch" href="/assets/js/15.3182e624.js"><link rel="prefetch" href="/assets/js/16.1cd90f5d.js"><link rel="prefetch" href="/assets/js/17.eb64de4d.js"><link rel="prefetch" href="/assets/js/18.92441ac1.js"><link rel="prefetch" href="/assets/js/19.c2325eda.js"><link rel="prefetch" href="/assets/js/2.66950f46.js"><link rel="prefetch" href="/assets/js/21.ff9b09e6.js"><link rel="prefetch" href="/assets/js/22.5d8dda60.js"><link rel="prefetch" href="/assets/js/23.f733cc45.js"><link rel="prefetch" href="/assets/js/24.98651580.js"><link rel="prefetch" href="/assets/js/25.f80a6f5c.js"><link rel="prefetch" href="/assets/js/26.50e2d684.js"><link rel="prefetch" href="/assets/js/27.e50da8fa.js"><link rel="prefetch" href="/assets/js/28.075d8b9e.js"><link rel="prefetch" href="/assets/js/3.5142620c.js"><link rel="prefetch" href="/assets/js/4.d57cba5f.js"><link rel="prefetch" href="/assets/js/5.ef8bbdd7.js"><link rel="prefetch" href="/assets/js/6.a5e11315.js"><link rel="prefetch" href="/assets/js/7.0bcef07b.js"><link rel="prefetch" href="/assets/js/8.c6209926.js"><link rel="prefetch" href="/assets/js/9.49b7ba3b.js">
+    <link rel="preload" href="/assets/css/0.styles.f080e4e2.css" as="style"><link rel="preload" href="/assets/js/app.7581f531.js" as="script"><link rel="preload" href="/assets/js/20.627408a1.js" as="script"><link rel="prefetch" href="/assets/js/10.982211fa.js"><link rel="prefetch" href="/assets/js/11.7b640b98.js"><link rel="prefetch" href="/assets/js/12.86ae73d7.js"><link rel="prefetch" href="/assets/js/13.3aa6b9a4.js"><link rel="prefetch" href="/assets/js/14.6a6dc318.js"><link rel="prefetch" href="/assets/js/15.3182e624.js"><link rel="prefetch" href="/assets/js/16.1cd90f5d.js"><link rel="prefetch" href="/assets/js/17.eb64de4d.js"><link rel="prefetch" href="/assets/js/18.92441ac1.js"><link rel="prefetch" href="/assets/js/19.c2325eda.js"><link rel="prefetch" href="/assets/js/2.66950f46.js"><link rel="prefetch" href="/assets/js/21.ff9b09e6.js"><link rel="prefetch" href="/assets/js/22.5d8dda60.js"><link rel="prefetch" href="/assets/js/23.435e40dd.js"><link rel="prefetch" href="/assets/js/24.98651580.js"><link rel="prefetch" href="/assets/js/25.02ddfc04.js"><link rel="prefetch" href="/assets/js/26.50e2d684.js"><link rel="prefetch" href="/assets/js/27.e50da8fa.js"><link rel="prefetch" href="/assets/js/28.075d8b9e.js"><link rel="prefetch" href="/assets/js/3.5142620c.js"><link rel="prefetch" href="/assets/js/4.d57cba5f.js"><link rel="prefetch" href="/assets/js/5.ef8bbdd7.js"><link rel="prefetch" href="/assets/js/6.a5e11315.js"><link rel="prefetch" href="/assets/js/7.0bcef07b.js"><link rel="prefetch" href="/assets/js/8.c6209926.js"><link rel="prefetch" href="/assets/js/9.49b7ba3b.js">
     <link rel="stylesheet" href="/assets/css/0.styles.f080e4e2.css">
   </head>
   <body>
@@ -51,7 +51,89 @@
 <span class="token punctuation">}</span>
  
 <span class="token keyword">export</span> <span class="token keyword">default</span> HashRouter<span class="token punctuation">;</span>
-</code></pre></div><h2 id="代码切割"><a href="#代码切割" aria-hidden="true" class="header-anchor">#</a> 代码切割</h2> <h2 id="高阶组件-hoc"><a href="#高阶组件-hoc" aria-hidden="true" class="header-anchor">#</a> 高阶组件(HOC)</h2> <h2 id="hook"><a href="#hook" aria-hidden="true" class="header-anchor">#</a> Hook</h2> <p>React 16.8Hook的出现，官方极力推崇函数式编程，在不使用类的情况下使函数组件也有自己的state，由此新增了多个API，极大增强了函数组件。原有create-react-app 创建的项目只要将react和react-dom升级到16.8以上版本即可使用Hook特性。</p> <h3 id="usestate"><a href="#usestate" aria-hidden="true" class="header-anchor">#</a> useState</h3> <p>顾名思义，该API是函数组件最常用的，他替代了类组件的this.state,使得函数组件也有自己的状态，调用解构的第二个函数传递新参数时刷新视图。
+</code></pre></div><h2 id="代码切割"><a href="#代码切割" aria-hidden="true" class="header-anchor">#</a> 代码切割</h2> <h2 id="高阶组件-hoc"><a href="#高阶组件-hoc" aria-hidden="true" class="header-anchor">#</a> 高阶组件(HOC)</h2> <p>高阶组件类似与高阶函数，用与对组件添加增强功能，如：操纵原组件props，增强生命周期函数，增加额外的状态,以及类似vue中的mixin组件增强，react中并没有此类API，可通过代码实现mixins功能，更多HOC高阶特性玩法还有很多。。。</p> <h3 id="操纵组件props"><a href="#操纵组件props" aria-hidden="true" class="header-anchor">#</a> 操纵组件props</h3> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">import</span> React <span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> ReactDom <span class="token keyword">from</span> <span class="token string">'react-dom'</span><span class="token punctuation">;</span>
+<span class="token keyword">class</span> <span class="token class-name">App</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span><span class="token punctuation">{</span>
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">return</span><span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>div<span class="token operator">&gt;</span><span class="token punctuation">{</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>name<span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>age<span class="token punctuation">}</span><span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">&gt;</span>
+    <span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">function</span> <span class="token function">HocPropsFunc</span><span class="token punctuation">(</span><span class="token parameter">WrapComponent</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token keyword">let</span> props<span class="token operator">=</span><span class="token punctuation">{</span>
+    name<span class="token punctuation">:</span><span class="token string">'CJ'</span><span class="token punctuation">,</span>
+    age<span class="token punctuation">:</span><span class="token number">23</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">return</span> <span class="token operator">&lt;</span>WrapComponent <span class="token punctuation">{</span><span class="token operator">...</span>props<span class="token punctuation">}</span> <span class="token operator">/</span><span class="token operator">&gt;</span><span class="token punctuation">;</span><span class="token comment">//添加props给原组件使用</span>
+<span class="token punctuation">}</span>
+ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>
+  <span class="token function">HocPropsFunc</span><span class="token punctuation">(</span>App<span class="token punctuation">)</span><span class="token punctuation">,</span>
+  document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'root'</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div><h3 id="再次返回类组件增强更多功能"><a href="#再次返回类组件增强更多功能" aria-hidden="true" class="header-anchor">#</a> 再次返回类组件增强更多功能</h3> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">class</span> <span class="token class-name">App</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span><span class="token punctuation">{</span>
+    state<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token function">componentDidMount</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+      console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'didmount'</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+      <span class="token keyword">return</span><span class="token punctuation">(</span>
+        <span class="token operator">&lt;</span>div<span class="token operator">&gt;</span><span class="token punctuation">{</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>name<span class="token punctuation">}</span><span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">&gt;</span>
+      <span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">function</span> <span class="token function">HOCClassFunction</span><span class="token punctuation">(</span><span class="token parameter">WrapComponent</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token keyword">class</span> <span class="token class-name">extends</span> React<span class="token punctuation">.</span>Component<span class="token punctuation">{</span>
+        <span class="token function">componentDidMount</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;WrapComponetn init&quot;</span><span class="token punctuation">)</span><span class="token comment">//此处可在返回的组件中执行更多</span>
+            <span class="token comment">//组件的操作，从而扩展更多功能</span>
+        <span class="token punctuation">}</span>
+        state<span class="token operator">=</span><span class="token punctuation">{</span>
+            name<span class="token punctuation">:</span><span class="token string">'CJ'</span><span class="token punctuation">,</span>
+            age<span class="token punctuation">:</span><span class="token number">23</span>
+        <span class="token punctuation">}</span>
+      <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token operator">&lt;</span>WrapComponent <span class="token punctuation">{</span><span class="token operator">...</span>this<span class="token punctuation">.</span>state<span class="token punctuation">}</span> <span class="token operator">/</span><span class="token operator">&gt;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>
+  <span class="token function">HOCClassFunction</span><span class="token punctuation">(</span>App<span class="token punctuation">)</span><span class="token punctuation">,</span>
+  document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'root'</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div><h3 id="修改组件生命周期函数或修改state状态"><a href="#修改组件生命周期函数或修改state状态" aria-hidden="true" class="header-anchor">#</a> 修改组件生命周期函数或修改state状态</h3> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">let</span> ReactMinxins<span class="token operator">=</span><span class="token punctuation">{</span><span class="token comment">//自定义mixins对象，可添加React生命周期函数或者一些辅助函数等</span>
+    <span class="token function">componentDidMount</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot; minxins COmponentWillMount&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">class</span> <span class="token class-name">App</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span><span class="token punctuation">{</span>
+    state<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token comment">//此处必须有一个state对象，否则增强状态时报错找不到对象函数</span>
+    <span class="token function">componentDidMount</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+      console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'class didmount'</span><span class="token punctuation">)</span><span class="token comment">//原生命周期函数</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+      <span class="token keyword">return</span><span class="token punctuation">(</span><span class="token comment">//显示增强后的name</span>
+        <span class="token operator">&lt;</span>div<span class="token operator">&gt;</span><span class="token punctuation">{</span><span class="token keyword">this</span><span class="token punctuation">.</span>state<span class="token punctuation">.</span>name<span class="token punctuation">}</span><span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">&gt;</span>
+      <span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">function</span> <span class="token function">mixinFunction</span><span class="token punctuation">(</span><span class="token parameter">WrapComponent</span><span class="token punctuation">)</span><span class="token punctuation">{</span><span class="token comment">//手写基于React的mixins功能</span>
+    <span class="token keyword">let</span> prevFn<span class="token operator">=</span><span class="token class-name">WrapComponent</span><span class="token punctuation">.</span>prototype<span class="token punctuation">.</span>componentDidMount<span class="token punctuation">;</span><span class="token comment">//暂存componentDidMount函数</span>
+    <span class="token class-name">WrapComponent</span><span class="token punctuation">.</span>prototype<span class="token punctuation">.</span><span class="token function-variable function">componentDidMount</span><span class="token operator">=</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span><span class="token comment">//重写该函数，此处不能使用</span>
+    <span class="token comment">//箭头函数，否则this指向mixinFunction</span>
+      <span class="token function">prevFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//执行暂存的原组件的生命周期方法</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">setState</span><span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token comment">//像原组件添加状态</span>
+        name<span class="token punctuation">:</span><span class="token string">&quot;DJ&quot;</span><span class="token punctuation">,</span>
+        age<span class="token punctuation">:</span><span class="token number">23</span>
+      <span class="token punctuation">}</span><span class="token punctuation">)</span>
+      ReactMinxins<span class="token punctuation">.</span><span class="token function">componentDidMount</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//调用执行mixins方法</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> WrapComponent<span class="token comment">//返回增强后组件</span>
+  <span class="token punctuation">}</span>
+    ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>
+    <span class="token function">mixinFunction</span><span class="token punctuation">(</span>App<span class="token punctuation">)</span><span class="token punctuation">,</span>
+  document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'root'</span><span class="token punctuation">)</span>
+</code></pre></div><h2 id="hook"><a href="#hook" aria-hidden="true" class="header-anchor">#</a> Hook</h2> <p>React 16.8Hook的出现，官方极力推崇函数式编程，在不使用类的情况下使函数组件也有自己的state，由此新增了多个API，极大增强了函数组件。原有create-react-app 创建的项目只要将react和react-dom升级到16.8以上版本即可使用Hook特性。</p> <h3 id="usestate"><a href="#usestate" aria-hidden="true" class="header-anchor">#</a> useState</h3> <p>顾名思义，该API是函数组件最常用的，他替代了类组件的this.state,使得函数组件也有自己的状态，调用解构的第二个函数传递新参数时刷新视图。
 <br>
 一个简单的累加计数：</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">import</span> React <span class="token punctuation">,</span><span class="token punctuation">{</span>useState<span class="token punctuation">}</span><span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
 
@@ -146,6 +228,6 @@
         </a>
         →
       </span></p></div> </div> <!----></div></div>
-    <script src="/assets/js/app.d74d1f0d.js" defer></script><script src="/assets/js/20.b42f3375.js" defer></script>
+    <script src="/assets/js/app.7581f531.js" defer></script><script src="/assets/js/20.627408a1.js" defer></script>
   </body>
 </html>
