@@ -5,7 +5,37 @@ lang: en-US
 ## 简介
 ## 组件声明方式
 ### 函数组件
+函数组件没有自己状态和生命周期，但基于函数的概念可以延展出很多React的高级玩法，HOC、纯展示组件、或者16.8版本后HOOK增强后对函数组件新增的多个API几乎大部分类组件的功能都能通过HOOK来很好的解决。
+```js
+  function App(){
+  return(
+    <div>123123</div>
+  )
+}
+```
 ### 类组件
+#### Component
+使用该方式继承的组件有React的生命周期函数和状态等特性
+例子：
+```js
+class ReactComponent extends React.component{
+  constructor(props){//ES6类构造函数 用于接收传递的参数，不接受React默认接收并传递给props对象
+    super(props)//调用父类的构造方法
+    //执行react类组件初始化代码，如接收props并赋值到状态中
+    this.state={
+      name:"CJ"
+    }
+  }
+  render(){//渲染的JSX语法结果
+    return(
+      <div> this is a react component{this.state.name}</div>
+    )
+  }
+}
+```
+#### PureComponent
+PureComponent是对Component的性能优化，只做接收props并展示的功能，但是比函数组件多了状态和生命周期，就像是使用了shouldComponentUpdate()函数对props不渲染改变的结果，所以使用PureComponent的组件接收的props父组件中改动了自身也不会有任何变动。
+具体使用方法和原Component一样。
 ## 生命周期
 ## Context
 在组件化开发中，如何跨组件优雅的共享状态一直是很棘手的问题，常见的作法也有很多，使用状态管理（引入第三方react-redux,mobx等），嵌套多层的props，使用contextAPI等，用来处理平行组件或跨多层组件之间的通信问题，例如：全局的主题动态配置、处理全局状态（用户登录状态）、数据持久化(存储)等等。Context API用于多组件跨级传值，使用React.createContext()创建对象，该对象下有Provider和Consumer两个对象（生产者和消费者），生产者用于包装需要分享状态的组件，消费者用来接收参数。
@@ -112,7 +142,7 @@ class App extends React.Component{
   document.getElementById('root')
 );
 ```
-### 修改组件生命周期函数或修改state状态
+### 修改组件生命周期函数或修改state状态(mixins)
 ```js
 let ReactMinxins={//自定义mixins对象，可添加React生命周期函数或者一些辅助函数等
     componentDidMount(){
