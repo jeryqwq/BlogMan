@@ -34,3 +34,11 @@
 > 最后，感谢爱学习的你花时间阅读本文档！希望能给你带来更多不一样的认识和和进一步的理解，有任何错误欢迎指正。
 ---
 ### 如何给博客提建议&完善博客
+* 提建议：[在项目托管处提Issues即可](https://github.com/jeryqwq/BlogMan/issues)
+* 完善博客：
+克隆项目：
+1. git clone https://github.com/jeryqwq/BlogMan.git Blog //克隆该项目
+2. git checkout -b your-feature //创建新分支
+3. git commit -a -m "新增建议或者功能描述" //提交到本地
+4. git push origin your-branch
+5. 等待验证后重新构建

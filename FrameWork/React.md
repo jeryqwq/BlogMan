@@ -34,11 +34,12 @@ class ReactComponent extends React.component{
 }
 ```
 #### PureComponent
-PureComponent是对Component的性能优化，只做接收props并展示的功能，但是比函数组件多了状态和生命周期，就像是使用了shouldComponentUpdate()函数对props不渲染改变的结果，所以使用PureComponent的组件接收的props父组件中改动了自身也不会有任何变动。
+PureComponent是对Component的性能优化，只做接收props并展示的功能，但是比函数组件多了状态和生命周期，就像是使用了shouldComponentUpdate()函数对props类型为对象时不渲染改变的结果，所以使用PureComponent的组件接收的props父组件中改动了自身也不会有任何变动。
 具体使用方法和原Component一样。
 ## 生命周期
+借由官网[生命周期图标](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/)
 ## Context
-在组件化开发中，如何跨组件优雅的共享状态一直是很棘手的问题，常见的作法也有很多，使用状态管理（引入第三方react-redux,mobx等），嵌套多层的props，使用contextAPI等，用来处理平行组件或跨多层组件之间的通信问题，例如：全局的主题动态配置、处理全局状态（用户登录状态）、数据持久化(存储)等等。Context API用于多组件跨级传值，使用React.createContext()创建对象，该对象下有Provider和Consumer两个对象（生产者和消费者），生产者用于包装需要分享状态的组件，消费者用来接收参数。
+contextAPI为16.3后新增，在组件化开发中，如何跨组件优雅的共享状态一直是很棘手的问题，常见的作法也有很多，使用状态管理（引入第三方react-redux,mobx等），嵌套多层的props，使用contextAPI等，用来处理平行组件或跨多层组件之间的通信问题，例如：全局的主题动态配置、处理全局状态（用户登录状态）、数据持久化(存储)等等。Context API用于多组件跨级传值，使用React.createContext()创建对象，该对象下有Provider和Consumer两个对象（生产者和消费者），生产者用于包装需要分享状态的组件，消费者用来接收参数。
 ```js
 import React from 'react';
 const {Provider,Consumer} = React.createContext();//创建生产者和消费者
