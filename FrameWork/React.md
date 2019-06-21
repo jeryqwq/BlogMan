@@ -38,6 +38,18 @@ PureComponent是对Component的性能优化，只做接收props并展示的功�
 具体使用方法和原Component一样。
 ## 生命周期
 借由官网[生命周期图标](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/)
+先来看看再React类组件中的各种钩子函数：
+* constructor: 类构造器函数，最先执行，组件初始化等，用来接受props和其他值(已默认接收)
+* componentWillMount:组件挂载前执行
+* render: 执行渲染函数，返回JSX功能（Babel编译成createElement形式）
+* componentDidMount:组件挂载完毕的函数。
+* componentWillReceiveProps:即将废弃：组件所接受的props发生改变时执行的函数,只要父组件render被调用，该函数就会被触发
+组件更新时依次执行的函数
+* shouldComponentUpdate:性能优化函数，主要用来控制该组件是否重新渲染。
+* componentWillUpdate:传递状态改变前的值
+* render：重新调用渲染函数渲染。
+* componentDidUpdate：
+* componentWillUnmount：卸载组件
 ## Context
 contextAPI为16.3后新增，在组件化开发中，如何跨组件优雅的共享状态一直是很棘手的问题，常见的作法也有很多，使用状态管理（引入第三方react-redux,mobx等），嵌套多层的props，使用contextAPI等，用来处理平行组件或跨多层组件之间的通信问题，例如：全局的主题动态配置、处理全局状态（用户登录状态）、数据持久化(存储)等等。Context API用于多组件跨级传值，使用React.createContext()创建对象，该对象下有Provider和Consumer两个对象（生产者和消费者），生产者用于包装需要分享状态的组件，消费者用来接收参数。
 ```js
@@ -66,7 +78,7 @@ class App extends React.Component{
 }
 export default App;
 ```
-组件内的所有子组件可接收并共享该数据状态,Consumer组件内函数传递的参数即为context共享的对象，即调用setState参数修改该参数时，视图层也会做出响应.
+组件内的所有子组件可接收并共享该数据状态,Consumer组件内函数传递的参数即为context共享的对象，即调用setState参数修改该参数时，视图层也会做出响应。
 ```js
 import React, {Component } from 'react'
 import {Consumer} from './xxx.js' //导入消费者
