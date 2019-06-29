@@ -11,7 +11,7 @@
 这算是从小的兴趣了，超级向往自己画家里的墙壁，画各种动漫，海贼王，柯南什么的，那些能把自己喜欢的东西表达出来真的是太酷了。<br>
 ### 12年：
 <br>
-<img :src="$withBase('./../imgs/kenan.jpeg')" style="margin-left:250px" ><br>
+<img :src="$withBase('./../imgs/kenan.jpeg')"  ><br>
 
 ### 14年无聊画在衣服上：
 <br>
