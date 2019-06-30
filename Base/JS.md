@@ -95,6 +95,11 @@ p1.say===p2.say//false  this指向两个不同的函数
 搞不懂为什么p1__proto__会等于Person.prototype,p1__proto__.constructor会等于Person,而Person.prototype.constructor会等于Person,实例没有prototype属性，所以只能使用__proto__访问原型？
 
 ## 对象拷贝
+JS一些基本的数据类型和引用拷贝就不说了，直接进入主题，深度拷贝吧。
+1. 针对Object对象的深度拷贝
+```js
+JSON.parse(JSON.stringfy(obj));
+```
 ## 闭包
 闭包在应用中非常常见，他的好处也有相当多，例如：
 1. 他开辟了新的作用域，可以获取到外部函数和变量，而外部却无法访问到闭包内部的作用域内容，减少了代码变量冲突等问题。
@@ -168,7 +173,65 @@ function f1(){
 }
 f1()
 ```
-## 柯里化函数
+## 函数式编程
+### 柯里化函数
+目前对柯里化函数的理解层次还停留于传递函数和返回函数的阶段，接收多个参数，返回接收剩下参数的新函数的概念。
+实现：
+```js
+function currying(fn,...rest1){
+    return function(...rest2){
+        return fn.apply(null,rest1.concat(rest2))
+        //外层的函数传递一个函数，将两次所传递的参数整合并执行。
+    }
+}
+function test(...args){
+       console.log(args)
+}
+var item1=currying(test,1,2,3,4);
+item1(5,6) //输出[1, 2, 3, 4, 5, 6]，
+```
+柯里化函数还有其他功能，例如延迟执行，一个函数内的变量状态保存在内存中并不会被回收(闭包)
+```js
+var curryAdd=function (...rest){
+    const _args=rest;
+    //每次_args等于下方返回数据再push后的结果
+    return function cb(...rest){
+        if(rest.length===0){
+            return _args.reduce((a,b)=>a+b);
+        }else{
+            _args.push(...rest);
+             return cb;
+        }
+    }
+}()//闭包保存存储的数组
+
+curryAdd(1);
+curryAdd(2);
+curryAdd(3);
+curryAdd(4);
+curryAdd();// 输出10
+//接下来我们抽离一下逻辑代码
+var curry=function (fn){
+    const _args=[];
+    return function cb(...rest){
+        if(rest.length===0){
+            return fn.call(this,_args);
+        }else{
+            _args.push(...rest);
+             return cb;
+        }
+    }
+}
+var curryAdd=curry((args)=>{
+    return args.reduce((a,b)=>a+b)
+})
+//curry传递的事件中args为处理后的暂存数组对象，所以具体逻辑抽到对应的方法中代码更清晰。
+curryAdd(1);
+curryAdd(2);
+curryAdd(3);
+curryAdd(4);
+curryAdd();
+```
 ## 防抖
 ## 节流
 ## 浅谈类型判断
