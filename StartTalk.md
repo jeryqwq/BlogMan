@@ -22,6 +22,7 @@
 * [前端刻意练习](https://github.com/fezaoduke/fe-practice-hard)
 * [you-need-to-know-css](https://lhammer.cn/You-need-to-know-css/#/)
 * [Vue技术内幕](http://hcysun.me/vue-design/art/)
+* [深入理解Javascript系列](https://www.kancloud.cn/kancloud/deep-understand-javascript/43686)
 * 其它优秀的资源欢迎大家补充
 ### 企业官方前端团队
 * [转转前端](http://zzfed.com/#/list)

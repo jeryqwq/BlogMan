@@ -33,6 +33,12 @@ module.exports = {
         ]
       },
       {
+        title: 'JS深入系列',
+        children: [
+          '/JS/design-mode'
+        ]
+      },
+      {
         title: '框架必知',
         children: [
           '/FrameWorkBase/MVVM',

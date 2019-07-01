@@ -233,7 +233,84 @@ curryAdd(4);
 curryAdd();
 ```
 ## 防抖
+防抖节流傻傻分不清楚，至今对这两个概念还挺懵逼的，不都是控制调用的间隔的不同来实现高频率处理下的性能优化，只不过一个使用setTimeout，另一个使用时间戳相减。
+最初版本的防抖---
+```js
+var debounce = function() {
+    let timer;//立即执行函数，保存timer变量
+    return (fn)=>{
+        clearTimeout(timer)//每次调用清空上次的状态
+        timer = setTimeout(()=>{//再次赋值定时器
+            fn.call(this)
+        }, 2000)
+    }
+}()
+function test() {
+    console.log(this, 1)
+}
+debounce(test)
+debounce(test)
+debounce(test)//两秒后输出一次window,1
+```
+此时，我们再添加一个新功能，要求首次调用时立刻执行，我们做如下修改。
+```js
+var debounce = function() {
+    let timer;//立即执行函数，保存timer变量
+    let isFirst=true;
+    return (fn,interval)=>{
+        if(isFirst){
+            isFirst=false;
+            fn.call(this);
+        }else{
+            clearTimeout(timer)//每次调用清空上次的状态
+            timer = setTimeout(()=>{//再次赋值定时器
+                fn.call(this)
+            }, interval)
+        }
+    }
+}()
+function test() {
+    console.log(1)
+}
+//两秒后输出一次1
+debounce(test,2000)
+debounce(test,2000)
+debounce(test,2000)
+debounce(test,2000)
+```
+可是，人家的防抖能取消执行
+```js
+var debounce = function() {
+    let timer;//立即执行函数，保存timer变量
+    let isFirst=true;
+   
+    return (fn,interval)=>{
+         fn['cancel']=function(){//将取消函数挂载到fn中，即test
+         clearTimeout(timer)
+        }
+        if(isFirst){
+            isFirst=false;
+            fn.call(this);
+        }else{
+            clearTimeout(timer)//每次调用清空上次的状态
+            timer = setTimeout(()=>{//再次赋值定时器
+                fn.call(this)
+            }, interval)
+        }
+    }
+    
+}()
+function test() {
+    console.log(arguments)
+}
+debounce(test,2000)//仅立即执行一次
+debounce(test,2000)
+debounce(test,2000)
+debounce(test,2000)
+test.cancel()
+```
 ## 节流
+节个鸡儿，老子今晚不想节了🙃
 ## 浅谈类型判断
 类型判断一直是JS的迷，各种判断命令总是会在一些特定的情况下出现预料之外的情况，总结下常规的typeof,instanceof,Object.prototype.toString.call,--proto--.constructor===目标类型
 1. typeof：使用typeof常用来判断一些简单的类型判断，例如String，Number等，返回该对象类型的小写字符串，但是使用typeof来复杂类型时，typeof并不能很准确的判断出一个对象的类型
