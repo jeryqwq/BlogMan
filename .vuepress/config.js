@@ -35,7 +35,8 @@ module.exports = {
       {
         title: 'JS深入系列',
         children: [
-          '/JS/design-mode'
+          '/JS/design-mode',
+          '/JS/review-question'
         ]
       },
       {
