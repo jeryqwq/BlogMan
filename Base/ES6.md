@@ -2,12 +2,69 @@
 title: ES6,ES7
 lang: en-US
 ---
+
 ## let const
 
 ## class
-### extends的n种实现方式
-在读懂本篇之前，你需要对原型链和prototype有一定的了解(--proto--)
-
+### 继承的n种实现方式
+1. 原型prototype继承
+```js
+function Person(name){
+    this.name=name;
+}
+Person.prototype.sayName=function(){
+    console.log(this.name);
+}
+var p1=new Person("CJ");
+p1.sayName();//CJ
+```
+2. 构造函数实现(类似class中的constructor函数)
+```js
+function Person(name){
+    this.name=name;
+}
+var p1=function(name){
+    Person.call(this,name);//通过调用Person函数并传递this给this赋值
+        console.log(this.name);
+}
+p1("CJ");
+```
+3. 混合式实现
+```js
+function Person(name,age){
+    this.name=name;
+    this.age=age;
+}
+Person.prototype.sayName=function(){
+    console.log(this.name)
+}
+function Student(name,age){
+    Person.call(this,name);
+}
+Student.prototype=new Person();//Student.prototype=Person.prototype;
+Student.prototype.constructor=Student;//修复构造函数指向 
+var s1=new Student("CJ",23);//实例化Student时，原型指向Person原型
+s1.sayName();
+```
+4. ES6类extends继承
+```js
+    class Person{
+        constructor(name){
+            this.name=name;
+        }
+    }
+    class Student extends Person{
+        constructor(name,age){
+            super(name);//相当于Person.call(name,this)
+            this.age=age;
+        }
+        sayName(){
+            console.log(this.name);
+        }
+    }
+    var s1=new Student("CJ",23);
+    s1.sayName()//CJ
+```
 ## 箭头函数
 箭头函数为es6的函数另一种写法，相比原function的写法，箭头函数更能体现参数流向，且箭头函数中的this指向当前所在域的this。
 * 箭头函数中没有arguments对象，需使用...args来接受为一个数组。
@@ -16,7 +73,7 @@ lang: en-US
 * 箭头函数中传参可赋值一个默认参数,如果该参数没有传递时使用默认替代。
 ```js
 var test=(name="JC")=>{
-    console.log(name)
+    console.log(name);
 }
 test(); //JC
 test("CJ");//CJ
@@ -64,9 +121,6 @@ var {name,...args}={
 }
 console.log(name,args) //CJ {age: 24, likes: Array(0)}
 ```
-## 模板字符串
-## 对象字面量
-## 展开运算符
 ## proxy
 代理模式：为对象的访问、赋值、属性查找等启用中间层代理，先执行代理的函数，后根据情况返回具体的内容。与Object.defineprotype相似，使用get和set函数对被代理的对象进行操作。仅说明常用的get和set拦截，更多访问拦截请查看官方文档。
 ```js
