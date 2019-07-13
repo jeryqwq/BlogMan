@@ -122,7 +122,7 @@ var {name,...args}={
 console.log(name,args) //CJ {age: 24, likes: Array(0)}
 ```
 ## proxy
-代理模式：为对象的访问、赋值、属性查找等启用中间层代理，先执行代理的函数，后根据情况返回具体的内容。与Object.defineprotype相似，使用get和set函数对被代理的对象进行操作。仅说明常用的get和set拦截，更多访问拦截请查看官方文档。
+代理模式：为对象的访问、赋值、属性查找等启用中间层代理，先执行代理的函数，后根据情况返回具体的内容。与Object.defineprotype相似，使用get和set函数对被代理的对象进行操作,但能拦截更多的属性访问钩子。仅说明常用的get和set拦截，更多访问拦截请查看官方文档。
 ```js
 var target = {
     name: 'CJ',
