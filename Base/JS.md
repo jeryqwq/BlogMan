@@ -233,7 +233,7 @@ curryAdd(4);
 curryAdd();
 ```
 ## 防抖
-防抖节流傻傻分不清楚，至今对这两个概念还挺懵逼的，不都是控制调用的间隔的不同来实现高频率处理下的性能优化，只不过一个使用setTimeout，另一个使用时间戳相减。
+以前就是防抖节流傻傻分不清楚，看了N遍后发现防抖就是指定间隔之内重复触发仅触发最后一次，例如：按钮的疯狂点击操作只发送一次ajax。而节流顾名思义，就是频繁的触发该函数时，仅在指定的间隔中触发，即每次触发的频率时一样的，例如：LOL英雄的攻速，即使你疯狂点击目标，英雄也只会根据自身的攻速属性来进行攻击，而不是你点击的速度。
 最初版本的防抖---
 ```js
 var debounce = function() {
@@ -310,7 +310,31 @@ debounce(test,2000)
 test.cancel()
 ```
 ## 节流
-节个鸡儿，老子今晚不想节了🙃
+先来个最初的节流吧：
+```js
+var  throtter=function(fn,deloy){
+    var time=+new Date();//暂存当前时间
+    return (...args)=>{
+     var curTime=+new Date();
+     if(curTime-time<deloy){
+         //不满足条件
+     }else{
+         time=+new Date();//重新赋值最新的time
+         fn(...args);//执行fn函数并传参
+     }
+    }
+};
+var fn=(arg)=>{
+    console.log(arg)
+}
+var fhrottfn=throtter(fn,2000);
+fhrottfn(1);
+setInterval(()=>{
+    fhrottfn(1);
+},100)
+//即便定时器每隔100毫秒触发，函数执行时间的间隔仍然是2000毫秒
+```
+下班再修复下this指针
 ## 浅谈类型判断
 类型判断一直是JS的迷，各种判断命令总是会在一些特定的情况下出现预料之外的情况，总结下常规的typeof,instanceof,Object.prototype.toString.call,--proto--.constructor===目标类型
 1. typeof：使用typeof常用来判断一些简单的类型判断，例如String，Number等，返回该对象类型的小写字符串，但是使用typeof来复杂类型时，typeof并不能很准确的判断出一个对象的类型
