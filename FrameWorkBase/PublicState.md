@@ -292,3 +292,5 @@ export default observer(App);
 //input的onchage事件改变state的数据，通知组件重新渲染。
 ```
 自此，一个基本的mobx-react的功能就完成了，mobx的大致运行原理也更深入了一层。
+## redux-saga
+### 简介:

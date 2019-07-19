@@ -335,6 +335,31 @@ setInterval(()=>{
 //即便定时器每隔100毫秒触发，函数执行时间的间隔仍然是2000毫秒
 ```
 下班再修复下this指针
+```js
+var  throtter=function(fn,deloy){
+    var time=+new Date();//暂存当前时间
+    return function(...args){
+     var curTime=+new Date();
+     if(curTime-time<deloy){
+         //不满足条件
+     }else{
+         time=+new Date();//重新赋值最新的time
+         fn.call(this,...args);//执行fn函数并传参
+     }
+    }
+};
+var fn=(arg)=>{
+    console.log(arg)
+}
+var fhrottfn=throtter(fn,2000);
+var obj={
+    fn:fhrottfn
+}
+setInterval(()=>{
+    obj.fn(1)
+},100)
+
+```
 ## 浅谈类型判断
 类型判断一直是JS的迷，各种判断命令总是会在一些特定的情况下出现预料之外的情况，总结下常规的typeof,instanceof,Object.prototype.toString.call,--proto--.constructor===目标类型
 1. typeof：使用typeof常用来判断一些简单的类型判断，例如String，Number等，返回该对象类型的小写字符串，但是使用typeof来复杂类型时，typeof并不能很准确的判断出一个对象的类型

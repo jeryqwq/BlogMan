@@ -70,6 +70,7 @@ module.exports = {
         title: '前端大杂烩',
         children: [
           '/Others/AntdForm',
+          '/Others/PrivateNpm',
         ]
       }
     ]
