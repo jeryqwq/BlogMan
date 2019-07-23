@@ -44,7 +44,19 @@ npm adduser #输入你的用户和密码以及邮箱
 npm publish # 发布 你的包
 ```
 ## package.json配置
+package.json的配置[官方文档](https://docs.npmjs.com/files/package.json)，针对目前主流的jsx或者vue文件的支持度并不支持，像是对模块化的js文件npm就可以很好的遍历他们之间对应的关系并发布，下面说几个比较常用且对发布有影响的配置。
+* name, version, description, main, author等通过字面意思即可理解，
+* version： 版本号（每次发布都需要大于之前的版本，否则无法发布
+* main：文件的主入口，js结尾的文件npm会自动遍历所有相关文件并发布
+* private： 不是付费用户发布必须填写false
+* author: 在npm市场的有效名称
+* scripts：提供快捷命令的入口，会被转换为其他命令执行
+* dependencies：平时我们通过--save安装的包以及对应的版本会被写入到该对象中
+* devDependencies：开发依赖，通过--dev安装的包会被写入到列表中
 
+
+```js
+```
 
 
 此时，地址已经配置好了，接下来看如何上传私有包
