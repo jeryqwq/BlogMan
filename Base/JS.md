@@ -334,7 +334,7 @@ setInterval(()=>{
 },100)
 //即便定时器每隔100毫秒触发，函数执行时间的间隔仍然是2000毫秒
 ```
-下班再修复下this指针
+下班之前再修复下this指针
 ```js
 var  throtter=function(fn,deloy){
     var time=+new Date();//暂存当前时间
