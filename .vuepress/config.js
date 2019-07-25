@@ -71,6 +71,7 @@ module.exports = {
         children: [
           '/Others/AntdForm',
           '/Others/PrivateNpm',
+          '/Others/IceFusion'
         ]
       }
     ]
