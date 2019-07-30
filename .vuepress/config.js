@@ -15,6 +15,10 @@ module.exports = {
         link: '/nav/Reading'
       },
       {
+        text:'作品',
+        link:'/nav/MY'
+      },
+      {
         text: 'GitHub',
         link: 'https://github.com/jeryqwq'
       },
