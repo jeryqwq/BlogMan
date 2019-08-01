@@ -92,4 +92,39 @@ function createElement(elType, attrs, children) {//对应参数：(DOM类型，�
     return el;//返回当前元素
 }
 ```
+## React中的虚拟DOM
 
+```js
+function App(){
+    return <div>123</div>
+}
+//等价于下方
+React.createElement('div',{name:'CJ',age:23},['123'])
+//所以每次当我们调用指定的类或者函数返回的虚拟DOM时，babel会将他转换为createElement的形式去执行
+//渲染一个函数或者组件我们只要使用<App></App>即可
+React.render(<App/>,'#app');
+//也等价于
+React.render({App(arg1,arg2)},'#app');
+//转换后：
+React.render(React.createElement('div',{name:'CJ',age:23},['123']),'#app');
+
+
+//使用class的组件
+class App extends React.Component{
+    constructor(props){
+        super(props);
+        console.log(props.name)
+    }
+    render(){
+        return{
+            <div>123</div>
+        }
+    }
+}
+React.render(<App/>,'#app');
+//也等价于
+React.render({new App({name:'cj'})},'#app');
+//转换后：
+React.render(React.createElement('div',{name:'CJ',age:23},['123']),'#app');
+
+```
