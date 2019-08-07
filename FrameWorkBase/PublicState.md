@@ -57,6 +57,7 @@ store.dispatch({ type: 'INCREMENT' });
 store.dispatch({ type: 'DECREMENT' });
 // 1
 ```
+react-redux动态更新就是store被dispatch后调用指定的组件进行状态刷新，实现多个组件之间共享状态。
 ## 手写简易的React-Redux
 ###  效果预览
 ---
@@ -155,7 +156,7 @@ class Child extends React.Component {
 export default Child;
 ```
 ## 更好用的MobX
-相比react-redux，mobx简洁的语法和神奇的响应式原理,相比react-redux而言项目复杂度降低了许多，在一个大型的react项目中，往往全局状态会有很多，开发者为了尽量减少手动输入字符串标识等，会把一个项目包含react-redux功能的文件拆分为reducer，action-type，action等，将每个store进行拆分为多个文件分开管理，这种开发方式并不适合一些中小型应用，繁琐复杂的定义和文件引用跳转等，直到后来使用了mobx，一个文件就对应一个state，即全局状态，action使用方法名称来定义，通过对象来调用和派发，即避免了定义常量字符串，也方便开发者使用编辑器的提示调用方法。
+相比react-redux，mobx简洁的语法和神奇的响应式原理,相比react-redux而言项目复杂度降低了许多，在一个大型的react项目中，往往全局状态会有很多，开发者为了尽量减少手动输入字符串标识等，会把一个项目包含react-redux功能的文件拆分为reducer，action-type，action等,使用combineReducers合并成一个reducer，将每个store进行拆分为多个文件分开管理，这种开发方式并不适合一些中小型应用，繁琐复杂的定义和文件引用跳转等，直到后来使用了mobx，一个文件就对应一个state，即全局状态，action使用方法名称来定义，通过对象来调用和派发，即避免了定义常量字符串，也方便开发者使用编辑器的提示调用方法。
 ## MobX用法
 * 使用前请安装mobx<br>
 Timer.js
@@ -293,4 +294,134 @@ export default observer(App);
 ```
 自此，一个基本的mobx-react的功能就完成了，mobx的大致运行原理也更深入了一层。
 ## redux-saga
-### 简介:
+### 简介
+最近看一些招聘要求上React全家桶又多了一个，起初好奇的去看了看，主要还是处理我们常见的异步全局状态，功能类似redux-thank,个人感觉前端很多代码和书写方式都没有说有一种特定的要求，使用react-redux或者mobx在异步数据获取后进行dispatch也是一种异步处理，如果非要说saga的好处的话，就是使用了Generator 函数的功能，相比之后的async/await，Generator似乎对异步的管控会更自由，异步代码调用也越来越像同步代码了。[代码地址](https://github.com/jeryqwq/redux-saga-demo)
+
+### 开始
+redux-saga也是基于redux的，所以基本的代码几乎都是一样的,下面时一个简单的计数器使用saga去控制状态。<br>
+reducer.js
+```js
+export default function counter(state = 0, action) {//传递当前的状态值/
+//以及action的信息{至少拥有一个type属性说明本次更新的类型}
+  switch (action.type) {
+    case 'INCREMENT':
+      return state + 1;
+    case 'INCREMENT_IF_ODD':
+      return (state % 2 !== 0) ? state + 1 : state
+    case 'DECREMENT':
+      return state - 1
+    default:
+      return state
+  }
+}
+
+```
+Counter.js
+```js
+import React, { Component, PropTypes } from 'react'
+//计时器组件，接收value，同步增加减少，异步增加减少的dispatch函数
+const Counter = ({ value, onIncrement, onDecrement, onIncrementAsync,onDecrementAsync }) =>
+  <div>
+    <button onClick={onDecrementAsync}>
+      Decrement after 1 second
+    </button>
+    {' '}
+    <button onClick={onIncrementAsync}>
+      Increment after 1 second
+    </button>
+    {' '}
+    <button onClick={onIncrement}>
+      Increment
+    </button>
+    {' '}
+    <button onClick={onDecrement}>
+      Decrement
+    </button>
+    <hr />
+    <div>
+      Clicked: {value} times
+    </div>
+  </div>
+Counter.propTypes = {
+  value: PropTypes.number.isRequired,
+  onIncrement: PropTypes.func.isRequired,
+  onDecrement: PropTypes.func.isRequired,
+}
+export default Counter
+```
+sagas.js
+
+```js
+import { delay } from 'redux-saga'
+import { put, takeEvery, all } from 'redux-saga/effects'
+
+
+function* incrementAsync() {
+  yield new Promise((reslove)=>{
+    setTimeout(()=>{
+        reslove('success!!!')
+    },2000)
+  })
+  yield put({ type: 'INCREMENT',res:'test' })
+}
+function* decrementAsync(){
+    yield new Promise((reslove)=>{
+        setTimeout(reslove,1000);
+    })
+    yield put({type:'DECREMENT',msg:'DECREMENT'})
+    //执行store.dispatch({type:'DECREMENT',msg:'DECREMENT'})
+}
+//  watcher Saga: 在每个 INCREMENT_ASYNC action 派生一个新的 incrementAsync 任务
+function* watchIncrementAsync() {
+  yield takeEvery('INCREMENT_ASYNC', incrementAsync);
+}
+function* watchDecrementAsyc(){
+    yield takeEvery('DECREMENT_ASYNC',decrementAsync)
+}
+
+// notice how we now only export the rootSaga
+// single entry point to start all Sagas at once
+export default function* rootSaga() {
+  yield all([
+    decrementAsync(),
+    incrementAsync(),
+    watchIncrementAsync(),
+    watchDecrementAsyc(),
+  ])
+}
+```
+main.js(入口文件)
+```js
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { createStore, applyMiddleware } from 'redux'
+import createSagaMiddleware from 'redux-saga'
+import Counter from './Counter';
+import reducer from './reducers';
+import rootSaga from './sagas';
+
+const sagaMiddleware = createSagaMiddleware();
+//创建saga中间件
+const store = createStore(
+  reducer,
+  applyMiddleware(sagaMiddleware)//使用redux使用中间件
+)
+sagaMiddleware.run(rootSaga);//启动异步saga
+const action = type => store.dispatch({type})//派发行为
+function render() {
+  ReactDOM.render(
+    <Counter //传递同步异步行为
+      value={store.getState()}
+      onIncrement={() => action('INCREMENT')}
+      onDecrement={() => action('DECREMENT')} 
+      onIncrementAsync={() => action('INCREMENT_ASYNC')}
+      onDecrementAsync={() => action('DECREMENT_ASYNC')} />,
+      document.getElementById('root')
+  )
+}
+render()
+store.subscribe(render)//绑定视图层，数据变更做出对应的响应（刷新视图）
+```
+实现效果就是四个按钮，每个按钮点击绑定各自的同步异步事件，各自按照各自的时间触发实现。个人理解还是较浅。
+## 动手实现saga
+还早还早，Generator 底层原理还没开始接触，先去看看再回来试试。
