@@ -186,7 +186,9 @@ test();
 // 3秒后   三秒后
 // 2秒后 3秒后   三秒后
 ```
-发现async挺神奇的，总觉得他似乎能追踪到异步所执行的时间，我所认为的输出应该是begin=>enter promise1=>enter promise2=>promise1 exec=>promise2 exec=>输出结果,但是它似乎好像追踪到了promise2的reslove的激活时间，promise1 exec和enter promise2竟然是同时输出的，可能内部已经提前运行了一遍。
+解释下整个的运行过程：同步=》异步（微任务=》宏任务）
+前面就只是单纯的定义而已，直接看后面的async函数，执行test之前有一个console(beign)，
+然后等待promise1返回结果，promise1内同步代码enter promise先打印，返回的promise中，reslove之前的代码也是同步的，所以打印promise1 exec，两秒后调用reslove，此时执行等待result2，打印同步的enter promise2和promise2exec，过两秒后答应2秒后和3秒后
 
 ## 手写一个Promise
 ### Promise 规范

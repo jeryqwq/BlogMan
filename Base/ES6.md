@@ -141,4 +141,70 @@ var proxy = new Proxy(target,{
 ```
 ## decorator(装饰器)
 使用过JAVA应该都会了解装饰器，spring MVC中用来修饰类或者方法，@Controller|@RequestionMapper,对类或则方法功能进行增强。
-## Babel编译
+## generator函数
+一直以为会promise和async/await就好了，可以直接跳过generator，果然想法很天真，redux
+-saga使用了generator函数，最近又在搞懂saga原理的路上艰难前行，先把generator玩通。
+###  使用方法
+```js
+function* gen() {//generator函数在函数申明前使用*号说明该函数是一个异步函数
+    let r1=yield new Promise((reslove)=>{
+      setTimeout(()=>{reslove('res1')},1000);
+    });
+    let r2=yield new Promise((reslove)=>{
+      setTimeout(()=>{reslove('res2')},1000);
+    });
+    let r3=yield new Promise((reslove)=>{
+      setTimeout(()=>{reslove('res3')},1000);
+    });
+    console.log('gen',r1,r2,r3);
+};
+```
+是不是感觉这种写法和async/await贼像啊，执行后发现什么都没发生，屁都没放一个
+<br>
+*  next:执行gen函数返回的对象后包含的方法，用来调用下次个的yield后的异步函数并放到返回的对象的value中,代码:
+```js
+var g=gen();
+g.next();//执行next会返回一个对象{value: Promise, done: false}
+```
+*  value:此次yield后的异步函数,通过.then(res=>res)取到返回的值
+* done:异步操作是否执行完毕，即接下来是否还有yield执行
+
+```js
+var g=gen();
+let res= g.next();//开始执行第一个yield 执行next会返回一个对象{value: Promise, done: false}
+res.value.then((res)=>{
+    console.log(res);//取得第一个r1的promise的结果 res1
+    return g.next(res).value;// 执行next返回下一个promise(r2)
+}).then((res)=>{//promise(r2)
+    console.log(res);//r2的结果 res2
+    //g.next(res)返回的对象为上一个promise(r2)和done:false
+    return g.next(res).value;//执行next返回下一个promise(r3)
+}).then((res)=>{
+    console.log(res);//r3的结果 res3
+    return g.next(res).value;
+}).then((res)=>{
+    console.log(res)//最后一次，已经没有东西了。 undefined
+    return g.next()//返回{value:undefined,done:true} done为true就代表已经完成啦
+})
+```
+一直这样写岂不是很麻烦，我们使用函数来迭代处理下
+```js
+var  runGen=function(){
+    var g=gen();//生成迭代对象
+    function run(val){
+      var res=g.next(val);//将值传递给下一次调用
+      if(res.done){//是否是最后一次（已经完成）
+        return res.value;//直接返回最后的值
+      }else{
+        res.value.then((res)=>{//取得下一次promise返回的结果
+            console.log(res)
+            run(res)//再次迭代，直到done为true
+        });
+      }
+    }
+     run();
+}()
+```
+
+
+

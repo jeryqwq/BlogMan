@@ -26,7 +26,7 @@
 * [React源码分析-组件](https://github.com/amandakelake/blog/issues/27)
 * [React源码分析-setState](https://github.com/amandakelake/blog/issues/29)
 * [redux源码分析](https://github.com/amandakelake/blog/issues/33)
-*[高级前端进阶](https://muyiy.vip/)
+* [高级前端进阶](https://muyiy.vip/)
 * [瓶子君博客](https://github.com/sisterAn/blog/issues)
 * 其它优秀的资源欢迎大家补充
 ### 企业官方前端团队

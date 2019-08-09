@@ -69,7 +69,7 @@ ReactDOM.render(<WrappedNormalLoginForm />, mountNode);
 ```
 此时一个普通的登录的表单验证就配置好了，输入时也会动态提示用户输入内容的错误信息，然后我们开始根据官方的语法来实现一波antd-Form
 ## 效果预览
-仅实现功能验证，就不做美化惹，仅供学习！！！<br>
+仅实现功能验证，就不做美化了，仅供学习！！！<br>
 
 <img :src="$withBase('./../imgs/antdform.gif')" alt="Antd表单运行预览">
 
@@ -222,7 +222,7 @@ export default function(WrapComponent){
                     setTimeout(()=>{this.validateFields(item)},idx*2)
                 })
                 this.setState({},()=>{//参数验证不应该马上用setState操作对象，
-                //多个setState时React会合并操作，导致部分操作丢失，使用局部变量就好惹
+                //多个setState时React会合并操作，导致部分操作丢失，使用局部变量就好了
                     setTimeout(() => {
                         Object.keys(this.state.errTips).length<=0?fn(false,this.state.values):fn(this.state.errTips,this.state.values);
                     }, 0);
@@ -297,4 +297,4 @@ export default function(WrapComponent){
     }
 }
 ```
-自此，一个与antd官方语法相似的语法组件就写好惹 ，后续可添加更多校验规则，发现看完官方的用法的文档，自己写的又他妈是冰山一角。仅供学习参考！！！
+自此，一个与antd官方语法相似的语法组件就写好了 ，后续可添加更多校验规则，发现看完官方的用法的文档，自己写的又他妈是冰山一角。仅供学习参考！！！
