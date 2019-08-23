@@ -172,11 +172,11 @@ class TestClass extends React.Component{
     console.log('Test组件render函数渲染',this.props);
     return React.createElement("div", {
       name: name
-    }, React.createElement("p", null,this.state.name),
-    React.createElement("p", null,this.state.count),
-		React.createElement("p", null,`Props:${this.props.name}`),
+    }, React.createElement("p", null,`name:${this.state.name}`),
+    React.createElement("p", null,`count:${this.state.count}`),
+    React.createElement("p", null,`Props:${this.props.name}`),
     React.createElement('input',{value:'点击触发setState',type:'button',onclick:()=>{this.handleChangeState()}}),
-    React.createElement(TestNode)//类组件内渲染虚拟DOM对象
+    React.createElement(TestNode)//类组件render()函数再次渲染虚拟DOM对象
     );
   }
 }
@@ -187,7 +187,7 @@ const App=React.createElement(TestClass, {
 //调用我们自己写的React的render方法
 React.render(App, document.querySelector('#app'));
 ```
-看完上述的组件代码，懂一点React的都应该能直到运行的结果是什么了吧，展示this.state对象内的name和count，点击按钮触发事件执行this.setState()去触发视图更新，每次点击count+1,以及修改name的值，并且在组件执行的生命周期执行各自的方法打印对应的值。我们来实现一下和react相同语法的功能。
+看完上述的组件代码，懂一点React的都应该能直到运行的结果是什么了吧，展示this.state对象内的name和count以及传递的props的name属性，点击按钮触发事件执行this.setState()去触发视图更新，每次点击count+1,以及修改name的值，并且在组件执行的生命周期执行各自的方法打印对应的值。我们来实现一下和react相同语法的功能。
 * index.js(react入口文件)
 ```js
 import createElement from './createElement';

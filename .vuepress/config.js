@@ -50,8 +50,11 @@ module.exports = {
           '/FrameWorkBase/MVC',
           '/FrameWorkBase/VisualDom',
           '/FrameWorkBase/DomDiff',
-          '/FrameWorkBase/Route',
-          '/FrameWorkBase/PublicState',
+          '/FrameWorkBase/reactRoute',
+          '/FrameWorkBase/VueRouter',
+          '/FrameWorkBase/reactPublicState',
+          '/FrameWorkBase/VueState',
+
         ]
       },
       {
