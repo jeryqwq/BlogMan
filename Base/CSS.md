@@ -2,7 +2,7 @@
 title: CSS
 lang: en-US
 ---
-## clip-path 各属性详解
+## clip-path 
 clip-path用来创建各种不规则的图形，使用clip-path能够完成大部分的多边形或者畸形的弧形等。
 * clip-path: circle(40% at 0px 0px);
 <br>
@@ -13,3 +13,5 @@ clip-path用来创建各种不规则的图形，使用clip-path能够完成大�
 * clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
 <br>
 polygon 最常用的属性，使用两个值来表示每一个点（left，top），每两个值确定一个点，多个点确定一个面，最终生成多变图形连接
+
+## SVG
