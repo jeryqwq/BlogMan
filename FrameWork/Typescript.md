@@ -38,6 +38,7 @@ enum Flag { success=0,error=1}
 let result:Flag=Flag.success;//result必须为Flag中的一种类型，否则报错
 ```
 ### 函数
+
 函数规范应该使很常用的，例如：A要用B的方法，B就应该定义自己函数接收的参数类型和返回的类型。
 ```ts
 function  runMethod(name?:string):{name:string}{ //定义参数类型和方法返回类型
@@ -48,7 +49,117 @@ methodRes=runMethod('CJ+').name;//赋值，都为string
 console.log(methodRes)
 ```
 ### 类
-重头戏，各大OOP语言的三大特性：继承，多态，封装都要有，一个都不少，语法和关键字几乎和Java一模一样，熟悉java可直接上手
+重头戏，各大OOP语言的三大特性：继承，多态，封装都要有，一个都不少，语法和关键字几乎和Java一模一样，熟悉java可直接上手,我们先来使用ts的类语法实现一个Person类。
 ```ts
+class Person{
+    private name:string;//private 私有变量，确保只有当前在内部才能访问
+    private age:number;//所有类的实例下的属性都应该是私有的且暴露一个共有的get和set方法
+    getName():string{
+        return this.name;
+    };
+    setName(name:string):void{
+        this.name=name
+    }
+    getAge():number{
+        return this.age;
+    }
+    setAge(age:number):void{
+        this.age=age;
+    }
+    say():void{//未使用关键字定义的函数和变量默认public  全局访问
+        console.log(`${this.name}is say: I am ${this.age} `)
+    }
+}
+let p1:Person;
+p1=new Person("CJ",23);
+p1.say();//CJ is  say:  i am 23
+```
+## 抽象类
+抽象类中，只包含方法体和变量签名，不包含方法具体的实现，所有继承他的类都应该实现其定义的方法和变量。相当于给一个类定下规范，你应该实现哪些方法，该有那些变量。
+```ts
+abstract class Person{
+    public name:string;
+    public age:number;
+    public say():void;
+    constructor(name:string,age:number){
+        this.name=name;
+        this.age=age;
+    }
+}
+class Man extends Person{
+    super(name:string,age:number);//super调用父级的constructor。与es6类的继承相识
+    say():void{//必须实现该方法
+        console.log(`${this.name}is say: I am ${this.age} `)
+    }
+    work():void{//可扩展自己的方法
+        console.log(`${this.name}is working。。。`)
+    }
+}
+```
+## 作用域修饰符
+作用域修饰符修饰类里面包含的每个变量和函数的作用域范围，分为三种 public-全局，protected-受保护的，private-私有的
+### private
+仅在自己的内部使用，外部无法访问，包括子类也无法访问
+```ts 
+class Person{
+    private name:string;//定义实例私有变量
+    constructor(name:string){
+        this.name=name;//仅在自己内部访问
+    }
+}
+class Man extends Person{
+    super(name:string);
+    say():void{
+        console.log(this.name)//Property 'name' is private and only accessible within class 'Person'
+    }
+}
+// let p1:Person=new Person('CJ');
+// console.log(p1.name);//Property 'name' is private and only accessible within class 'Person'
+```
+### protected
+相比private有更大的范围，外部无法访问，但是在内部和有继承关系的子类可以访问。
+```ts
+class Person{
+    protected name:string;
+    constructor(name:string){
+        this.name=name
+    }
+}
+class Man extends Person{
+    // constructor子类的构造器函数可不传，默认调用父类的构造器
+    say():void{
+        console.log(this.name)
+    }
+}
+var p1:Person = new Man('CJ');//可以定义父类的类型实例化子类，即父类包含子类
 
+let p2:Man=new Person("CJ");//报错：定义子类的类型赋值父类实例,子类不包含父类
+console.log(p1.name);//Property 'name' is protected and only accessible within class 'Person' and its subclasses
+// name属性是受保护的，而且仅在person的子类可访问
+```
+### public
+默认修饰符，可不写，公共的，内部和外部都可以访问，通常用来修饰一些对外暴露的接口和变量
+```ts
+    class Person{
+        public name:string;
+        constructor(name:string){
+            this.name=name;
+        }
+    }
+    class Man extends Person{
+        public say():void{
+            console.log(this.name)
+        }
+    }
+    let p1:Man=new Man("CJ");
+    p1.say();//CJ
+```
+## 泛型
+在Java中泛型泛指可以是任何类型的对象，他和ts基本类型的any有一点相识，但是泛型可以传递参数类型，常用来推导类型，而any仅代表所有的类型，ts中常出现any反而ts存在的意义就不大了
+```ts
+function identity<T>(arg:T):T{
+    return arg
+}
+let outputNumber=identity<number>(12);
+console.log(outputNumber);
 ```
