@@ -62,6 +62,7 @@ module.exports = {
         children: [
           '/FrameWork/Typescript',
           '/FrameWork/Vue',
+          '/FrameWork/Vue3',
           '/FrameWork/React',
           '/FrameWork/Koa'
         ]
