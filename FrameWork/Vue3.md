@@ -1,5 +1,5 @@
 ---
-title: Vue3初识
+title: Vue3
 lang: en-US
 ---
 ## 关于Vue3
@@ -67,6 +67,7 @@ Vue3与10月6号左右宣布即将发布，作者也公开了底层的基于prox
     </script>
 </body>
 </html>
+<<<<<<< HEAD
 ```
 开始感觉真的很奇怪，vue3是如何做到effect内的函数仅因为自己函数内有的变量改动才会触发执行，感觉好神奇，每次依赖收集都能收集如此颗粒化。
 
@@ -76,6 +77,19 @@ Vue3与10月6号左右宣布即将发布，作者也公开了底层的基于prox
 ### reactive.js
 ```js
 llet {track,trigger}=require('./track');//触发器和收集依赖
+=======
+
+```
+开始感觉真的很奇怪，vue3是如何做到effect内的函数仅因为自己函数内有的变量改动才会触发执行，感觉好神奇，如何优化能做到这样？
+## 核心原理及实现
+使用typescript构建，刚学，比较菜，就当原生JS看就好了
+###  reactive.ts
+源码路径：vue-next\packages\reactivity\src\reactive.ts
+
+将数据转换为响应式，使用proxy代理对应的target，劫持对应的get，set，weakMap做代理映射表，基于其弱引用的特性，key只能为Object类型，对象不存在时GC自动回收其value，性能优化。
+```ts
+let {track,trigger}=require('./track');//触发器和收集依赖
+>>>>>>> 80a59d6e253bb44accfd7e862edcee4836ea48f6
 import {proxyConstructor,Handle} from './interface';//ts接口，类型约束handler和proxy
 let toProxy=new WeakMap();//存储代理对象弱引用，key只能为非简单类型，key为空时方便GC机制回收对用的value
 let toRaw=new WeakMap();//防止重复代理已经代理过的proxy对象做缓存检查
@@ -128,9 +142,15 @@ function createReactiveObj<T extends Object >(target:T|any):proxyConstructor{
     }
 }
 ```
+<<<<<<< HEAD
 ### track.ts
 effect函数收集监听对象effect里target对应的函数，利用执行函数时会访问到函数内监听对象的值，触发handler的get，执行收集依赖，相同的key放入同一个set集合,改变时在set函数内触发对应key的set集合的函数依次执行
 
+=======
+
+#### track.ts
+effect函数收集监听对象effect里target对应的函数，利用执行函数时会访问到函数内监听对象的值，触发handler的get，执行收集依赖，相同的key放入同一个set集合,改变时在set函数内触发对应key的set集合的函数依次执行
+>>>>>>> 80a59d6e253bb44accfd7e862edcee4836ea48f6
 ```js
 let {effectStacks}=require('./effect');//存储effect函数的栈接口数组
 let targetMap=new WeakMap();
@@ -173,6 +193,7 @@ export function trigger(target,type,key){//触发依赖执行
         } 
     }
 }
+<<<<<<< HEAD
 
 ```
 
@@ -180,6 +201,13 @@ export function trigger(target,type,key){//触发依赖执行
 存储effect栈数组，每次effect函数调用时都会往effect栈数组推入依赖的函数，然后执行一次effect内包裹的函数去触发proxy的get，再去触发收集依赖，以特定的格式收集存储该依赖，执行完毕后移除push的effect函数。
 
 ```js
+=======
+
+```
+#### effect.ts
+存储effect栈数组，每次effect函数调用时都会往effect栈数组推入依赖的函数，然后执行一次effect内包裹的函数去触发proxy的get，再去触发收集依赖，以特定的格式收集存储该依赖，执行完毕后移除push的effect函数。
+```ts
+>>>>>>> 80a59d6e253bb44accfd7e862edcee4836ea48f6
  let effectStacks:Array<Function>=[];
  function createReactiveEffect(fn:Function):void{
     let effect =function(){
@@ -204,6 +232,40 @@ export {
     effectStacks,
     effect
 };
+<<<<<<< HEAD
+=======
+```
+### 效果
+因为环境是ts构建，所以使用node去执行对应的代码
+```ts
+import {reactive} from './reactive';
+import {effect } from './effect';
+let obj1={name:'CJ'}
+let p1=reactive(obj1);
+effect(()=>{
+    console.log("effect1:"+p1.name)
+})
+effect(()=>{
+    console.log("effect2:"+p1.name)
+})
+p1.name="CJI@";
+p1.name="CJI1";
+p1.name="CJI2";
+p1.name="CJI3";
+//输出顺序
+// effect1:CJ name effect1 首次执行
+// effect2:CJ name effect2首次执行
+// effect1:CJI@  name  effect1 修改触发
+// effect2:CJI@  name  effect2 修改触发
+// effect1:CJI1   name  effect1 修改触发
+// effect2:CJI1
+// effect1:CJI2
+// effect2:CJI2
+// effect1:CJI3
+// effect2:CJI3
+
+
+>>>>>>> 80a59d6e253bb44accfd7e862edcee4836ea48f6
 ```
 ### 效果
 
