@@ -1,82 +1,155 @@
 ---
-title: Vue进阶
+title: Vue全家桶进阶
 lang: en-US
 ---
 ## 简述
 Vue官网的文档已经是非常详细了，基础建议直接看[官方文档](https://cn.vuejs.org/)或者烂大街的视频;
-
+本篇主要基于vue-cli3实现大型项目中常用的动态路由，权限管理，axios拦截，权限按钮等，看了很多第三方开源脚手架，没有文档用起来还是很吃力，虽然打着开源的旗号免费公开源码，但是文档收费或者视频收费也是有点恶心，使用起来还是有点吃力，例如avue，而且往往把一些非核心的功能也添加了进来，造成源码的阅读体验极差。与其用他的，还不如我们自己从头到尾开始配置自己且拥有相关核心功能的脚手架。<div style="color:red">（主要是自己项目中用到了，没钱买视频也没钱买文档）</div>
 ## 主要内容
-* 在Vue中使用jsx实现模板语法之外的复杂逻辑和功能（开始怀疑自己到底是在写react还是vue）。
-* 实现自定义组件render函数，让组件更自由
-* 实现组件之间Dispatch和BroadCast（向上派发和向下广播）事件
-* 实现简易vue-router和vuex
+* 根据后端返回的权限菜单接口动态配置路由菜单
+* 全局路由权限拦截
+* axios配置，处理全局异常和token等
+* 配置权限指令按钮，对应权限开放对应功能
+* 在Vue中使用jsx实现模板语法之外的复杂逻辑和功能。
+* 实现组件之间Dispatch和BroadCast（向上派发和向下广播）事件和公开发布订阅。
+* vue-router和vuex原理
 
-呸呸呸，还没写完Vue3.0就出来了，直接Vue3吧
-前天刚出的版本，早听说vue要模仿react16.8的hooks重构，别说，重构的还很有模有样，下载了官方的代码构建了vue，引入浏览器试了一波水，虽然很多API还没迁移，但作者也说了，主要的核心功能已经完成了。
-抱着好奇心的姿态使用了，当我new Vue的时候发现不对劲了，Vue is not a constructor ，这玩意已经不能new了，后来想想，也是很有道理，打开官网[Vue Composition API](https://vue-composition-api-rfc.netlify.com/api.html#setup),API风格像react靠近,如果越来越像react，那是不是总有一天会被react替代掉,希望官方还是贯彻好上手为初心，优化API使用难度。vue3=react+mobx还是很有道理的，
-由于现在对应的模板解析和脚手架等都还未支持3.0，就直接使用浏览器环境引入vue3文件来使用下核心的API
-```html
-<!DOCTYPE html>
-<html lang="en">
+## 项目初始化
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    <script src="./js/vue.global.js"></script>
-    <!-- 官方仓库打包后代码 -->
-    <script src="./js/index.js"></script>
-</head>
+使用vue-cli3 [初始化看这里](https://cli.vuejs.org/zh/)
+``` BASH
+  #添加路由
+vue add router
+# 添加状态管理
+vue add vuex
+# 添加请求库
+vue add axios
+```
 
-<body>
+## 权限菜单
 
-    <script>
-        let renderVueTest=function () { 
-            // reactive-定义响应式数据，使用proxy进行监听
-            const state=Vue.reactive({
-                count:3,
-                double:Vue.computed(()=>state.count*2)
-            })
-            function increment(){
-                state.count++;
-            }
-            window.increment=increment;
-            Vue.watch(()=>{
-                document.body.innerHTML =`
-                watch your count: is ${state.count};
-                    double:${state.double}<br/>
-                    <input type="button" onclick="increment()" value="+1"/>
-                `
-            })
+基于全局状态以及route下addRoutes动态添加路由实现，先来看看我们基本的router配置，既然都已经是有权限管理了，所以我们的页面要划分为两个部分，一个是定死的，无论什么用户都能看到的部门，例如404页面，主页等，还有个部分就是我们需要通过后端接口动态调整修改路由，从而实现权限的细化，这部分的路由我们只能配置，不能对其调用vue.use()来使用，需要在后端返回对应权限菜单后我们来进行配置。
 
-         }()
-        //state example
-            let state = Vue.reactive({
-                count: 0,
-                text:''
-            });
-            function resetCount() {
-                state.count = 0;
-            }
-            function inerment(){
-                state.count++;
-            }
-            function changeText(param) { 
-                state.text+=param
-             }
-            Vue.watch(() => {
-                document.body.innerHTML =
-                    `watch your count: is ${state.count};
-                    text:${state.text}<br/>
-                    <input type="button" onclick="resetCount()" value="重置"/>
-                    <input type="button" onclick="changeText('-')" value="文字累加"/>
-                    `
-            },state);
-    </script>
-</body>
+router.js
 
-</html>
+``` JS
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+import Home from '../views/Home.vue'
+Vue.use(VueRouter)
+export const authRouters=[//仅仅导出需要处理的所有权限菜单,avue中讲这两个分开存放了，一个是view，另一个是pages
+  {
+    path: '/about',
+    name: 'about',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')//使用函数导入webpack会进行单独打包，使用jsonp原理进行异步按需加载
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import(/* webpackChunkName: "about" */ '../views/login/index.vue')
+  },
+  {
+    path: '/test',
+    name: 'login',
+    component: () => import(/* webpackChunkName: "about" */ '../views/login/index.vue')
+  }
+]
+const routes = [//此处放置无权限配置的菜单
+  {
+    path: '/',
+    name: 'home',
+    component: Home
+  },
+ 
+]
+
+const router = new VueRouter({
+  mode: 'hash',
+  base: process.env.BASE_URL,
+  routes//使用无须配置的路由先注册
+})
+
+export default router
 
 ```
+
+## vuex
+
+现在vuex中存放我们用户的状态，是否有权限以及用户信息等。
+
+```js
+import Vue from "vue";
+import Vuex from "vuex";
+Vue.use(Vuex);
+const { axios } = Vue;
+export default new Vuex.Store({
+  state: {
+    hasPermission: false,//是否有权限
+    userInfo: {}//用户信息
+  },
+  mutations: {},
+  actions: {
+    userLogin(userInfo) {
+      this.state.userInfo = userInfo;
+    },
+    async getRouter() {//模拟像后端获取用户权限数据
+      return new Promise(res => {
+        setTimeout(() => {
+          this.state.hasPermission = true;
+          res([
+            {
+              path: "/login",
+              id: 123
+            },
+            {
+              path: "/home",
+              auth: "home"
+            },
+            {
+              path: "/about",
+              auto: "about"
+            }
+          ]);
+        }, 500);
+      });
+    }
+  },
+  modules: {}
+});
+
+```
+## 路由守卫
+
+使用router的路由导航的生命周期方法可以很好的处理权限问题，每次路由变化前进行检测权限是否异常
+
+```js
+import router from './../router/index'
+import store from './../store/index'
+import {authRouters} from './../router/index'//引入router中需要有权限的菜单
+
+
+
+router.beforeEach( async (to,from,next)=>{
+    if(store.state.hasPermission){
+        next();//有权限放过
+    }else{
+        let route=[];
+        let res=await store.dispatch('getRouter');//得到用户权限菜单
+        res.forEach((element) => {//处理业务逻辑，真是项目中数据接口往往是一维数组，需要手动改变数据格式为[{path:'',name:'',children:[...]},{path:'',name:'',children:[...]}]
+            for (let index = 0; index < authRouters.length; index++) {
+                const item = authRouters[index];
+                item.path===element.path&&(route.push(item));
+            }
+        });
+        console.log("权限验证后路由",route);
+        router.addRoutes(route)
+    }
+    next()
+})
+```
+
+
 

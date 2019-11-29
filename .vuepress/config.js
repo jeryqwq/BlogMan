@@ -64,6 +64,7 @@ module.exports = {
           '/FrameWork/Vue',
           '/FrameWork/Vue3',
           '/FrameWork/React',
+          '/FrameWork/ReactHooks',
           '/FrameWork/Koa'
         ]
       },
