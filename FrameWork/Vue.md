@@ -17,6 +17,7 @@ Vue官网的文档已经是非常详细了，基础建议直接看[官方文档]
 ## 项目初始化
 
 使用vue-cli3 [初始化看这里](https://cli.vuejs.org/zh/)
+初始化后添加项目基础依赖（全家桶）
 ``` BASH
   #添加路由
 vue add router
@@ -26,9 +27,9 @@ vue add vuex
 vue add axios
 ```
 
-## 权限菜单
+## 动态路由
 
-基于全局状态以及route下addRoutes动态添加路由实现，先来看看我们基本的router配置，既然都已经是有权限管理了，所以我们的页面要划分为两个部分，一个是定死的，无论什么用户都能看到的部门，例如404页面，主页等，还有个部分就是我们需要通过后端接口动态调整修改路由，从而实现权限的细化，这部分的路由我们只能配置，不能对其调用vue.use()来使用，需要在后端返回对应权限菜单后我们来进行配置。
+基于全局状态以及route下addRoutes动态添加路由实现，先来看看我们基本的router配置，既然都已经是有权限管理了，所以我们的页面要划分为两个部分，一个是定死的，无论什么用户都能看到的部门，例如404页面，主页等，还有个部分就是我们需要通过后端接口动态调整修改路由，从而实现权限的细化，这部分的路由我们只能预先配置好，不能new初始化时使用，需要在后端返回对应权限菜单后我们来进行配置。
 
 router.js
 
@@ -37,33 +38,67 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 Vue.use(VueRouter)
-export const authRouters=[//仅仅导出需要处理的所有权限菜单,avue中讲这两个分开存放了，一个是view，另一个是pages
-  {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')//使用函数导入webpack会进行单独打包，使用jsonp原理进行异步按需加载
+export const authRouters=[//仅仅导出需要处理的所有权限菜单,此部分菜单的内容需要根据后端返回的数据增加
+   {
+    path: '/',
+    name: 'admin',
+    component: Layout,
+    children:[
+      {
+        path: '/home',
+        name: '首页',
+        mate:{
+          key:'name',
+          auth:["admin"]
+        },
+        component: () => import('../views/home/index.vue')
+      },
+      {
+        path: '/cusInfo',
+        name: '客户资料详情',
+        mate:{
+          key:'cusInfo',
+          auth:["admin"]
+        },
+        component: () => undefined
+      },
+      {
+        path: '/cusInfo/detail',
+        name: '客户信息详情',
+        mate:{
+          key:'detail',
+          auth:["admin"]
+        },
+        component: () => import('../views/cusInfo/cusInfo-detail/index.vue')
+      },
+      {
+        path: '/cusInfo/account',
+        name: '客户账户详情',
+        mate:{
+          key:'account',
+          auth:["admin"]
+        },
+        component: () => import('../views/cusInfo/account-detail/index.vue')
+      },
+      {
+        path: '/userInfo/rateConfig',
+        name: '费率调整',
+        mate:{
+          key:'rateConfig',
+          auth:["admin"]
+        },
+        component: () => import('../views/cusInfo/rote-config/index.vue')
+      }
+    ]
   },
-  {
-    path: '/login',
-    name: 'login',
-    component: () => import(/* webpackChunkName: "about" */ '../views/login/index.vue')
-  },
-  {
-    path: '/test',
-    name: 'login',
-    component: () => import(/* webpackChunkName: "about" */ '../views/login/index.vue')
-  }
 ]
 const routes = [//此处放置无权限配置的菜单
-  {
-    path: '/',
-    name: 'home',
-    component: Home
+   {
+    path: '/login',
+    name: 'login',
+    mate:{title:"登录"},
+    component: () => import(/* webpackChunkName: "about" */ '../views/login/index.vue')
   },
- 
 ]
 
 const router = new VueRouter({
@@ -84,41 +119,35 @@ export default router
 import Vue from "vue";
 import Vuex from "vuex";
 Vue.use(Vuex);
-const { axios } = Vue;
 export default new Vuex.Store({
   state: {
-    hasPermission: false,//是否有权限
-    userInfo: {}//用户信息
+    hasPermission: false,
+    userInfo: {}
   },
-  mutations: {},
+  mutations: {//commit 处理同步
+    setUserInfo(state,userInfo){
+      state.userInfo=userInfo;
+      Vue.axios.defaults.headers.common['token'] =userInfo.token;//将token设为header,具体看token在后端如何取值，一般header或者直接传参在数据中
+    }
+  },
   actions: {
-    userLogin(userInfo) {
-      this.state.userInfo = userInfo;
+    userLogin(context,userInfo) {//disptach 处理异步，接口等
+      context.commit('setUserInfo',userInfo);
     },
-    async getRouter() {//模拟像后端获取用户权限数据
-      return new Promise(res => {
-        setTimeout(() => {
-          this.state.hasPermission = true;
-          res([
-            {
-              path: "/login",
-              id: 123
-            },
-            {
-              path: "/home",
-              auth: "home"
-            },
-            {
-              path: "/about",
-              auto: "about"
-            }
-          ]);
-        }, 500);
-      });
+    async getRouter() {//vue路由守卫中调用此方法，只有在没有权限时执行
+      return new Promise((reslove)=>{
+        Vue.axios.get('/admin/auth/info').then((result)=>{
+          if(result.code===0){
+            this.state.hasPermission=true;//说明有权限，拿到权限菜单后动态渲染菜单
+            reslove(result.data.menus);//返回异步菜单数据
+          }
+        })
+      })
     }
   },
   modules: {}
 });
+
 
 ```
 ## 路由守卫
@@ -138,18 +167,89 @@ router.beforeEach( async (to,from,next)=>{
     }else{
         let route=[];
         let res=await store.dispatch('getRouter');//得到用户权限菜单
-        res.forEach((element) => {//处理业务逻辑，真是项目中数据接口往往是一维数组，需要手动改变数据格式为[{path:'',name:'',children:[...]},{path:'',name:'',children:[...]}]
-            for (let index = 0; index < authRouters.length; index++) {
+        res.forEach((element) => {//处理业务逻辑，真是项目中数据接口往往是一维数组，需要手动改变数据格式为
+        // [{path:'',name:'',children:[...]},{path:'',name:'',children:[...]}]
+            for (let index = 0; index < authRouters.length; index++) {//使用迭代diff我们配置的菜单，仅渲染相同的部分，即有权限的菜单。
                 const item = authRouters[index];
                 item.path===element.path&&(route.push(item));
             }
         });
         console.log("权限验证后路由",route);
-        router.addRoutes(route)
+        router.addRoutes(route)//动态添加用户对应diff后的权限菜单
+        next()
     }
-    next()
 })
 ```
+## axios配置
 
+使用默认的vue add axios 会生成很好格式的默认配置，只要在原来的基础上配置下即可
+
+```js
+"use strict";
+
+import Vue from 'vue';
+import axios from "axios";
+import store from './../store/index'
+// Full config:  https://github.com/axios/axios#request-config
+// axios.defaults.baseURL = process.env.baseURL || process.env.apiUrl || '';
+axios.defaults.headers.common['token'] ='';//添加你账户的token
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+
+let config = {
+  baseURL: process.env.baseURL || process.env.apiUrl || "http://49.235.107.238:3000/mock/27",//设置baseUrl
+  timeout: 60 * 1000, // Timeout超时
+  // withCredentials: true, // Check cross-site Access-Control
+};
+
+const _axios = axios.create(config);
+
+_axios.interceptors.request.use(
+  function(config) {
+    // Do something before request is sent  添加自定义参数
+    return config;
+  },
+  function(error) {
+    // Do something with request error 
+    return Promise.reject(error);
+  }
+);
+
+// Add a response interceptor
+_axios.interceptors.response.use(
+  function(response) {
+    // Do something with response data 处理全局返回时提示，如错误提示等
+    console.log("axios拦截",response);
+    return response.data;
+  },
+  function(error) {
+    // Do something with response error
+    return Promise.reject(error);
+  }
+);
+
+Plugin.install = function(Vue, options) {
+  Vue.axios = _axios;
+  window.axios = _axios;
+  Object.defineProperties(Vue.prototype, {//拦截访问对象
+    axios: {
+      get() {
+        return _axios;
+      }
+    },
+    $axios: {
+      get() {
+        return _axios;
+      }
+    },
+  });
+};
+
+Vue.use(Plugin)
+
+export default Plugin;
+
+```
+
+### 动态路由菜单过几天继续
 
 

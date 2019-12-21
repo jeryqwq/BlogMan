@@ -670,3 +670,5 @@ Array.prototype.concat=function(args){
 var result=arr.concat([4,5,6]);
 console.log(result)//[1, 2, 3, 4, 5, 6]
 ```
+
+## 作用域链详解

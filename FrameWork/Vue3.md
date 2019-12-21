@@ -67,29 +67,22 @@ Vue3与10月6号左右宣布即将发布，作者也公开了底层的基于prox
     </script>
 </body>
 </html>
-<<<<<<< HEAD
+
+
 ```
 开始感觉真的很奇怪，vue3是如何做到effect内的函数仅因为自己函数内有的变量改动才会触发执行，感觉好神奇，每次依赖收集都能收集如此颗粒化。
-
-
-
-
-### reactive.js
-```js
-llet {track,trigger}=require('./track');//触发器和收集依赖
-=======
-
-```
-开始感觉真的很奇怪，vue3是如何做到effect内的函数仅因为自己函数内有的变量改动才会触发执行，感觉好神奇，如何优化能做到这样？
 ## 核心原理及实现
+
 使用typescript构建，刚学，比较菜，就当原生JS看就好了
+
 ###  reactive.ts
+
 源码路径：vue-next\packages\reactivity\src\reactive.ts
 
 将数据转换为响应式，使用proxy代理对应的target，劫持对应的get，set，weakMap做代理映射表，基于其弱引用的特性，key只能为Object类型，对象不存在时GC自动回收其value，性能优化。
+
 ```ts
 let {track,trigger}=require('./track');//触发器和收集依赖
->>>>>>> 80a59d6e253bb44accfd7e862edcee4836ea48f6
 import {proxyConstructor,Handle} from './interface';//ts接口，类型约束handler和proxy
 let toProxy=new WeakMap();//存储代理对象弱引用，key只能为非简单类型，key为空时方便GC机制回收对用的value
 let toRaw=new WeakMap();//防止重复代理已经代理过的proxy对象做缓存检查
@@ -142,15 +135,11 @@ function createReactiveObj<T extends Object >(target:T|any):proxyConstructor{
     }
 }
 ```
-<<<<<<< HEAD
-### track.ts
-effect函数收集监听对象effect里target对应的函数，利用执行函数时会访问到函数内监听对象的值，触发handler的get，执行收集依赖，相同的key放入同一个set集合,改变时在set函数内触发对应key的set集合的函数依次执行
-
-=======
 
 #### track.ts
+
 effect函数收集监听对象effect里target对应的函数，利用执行函数时会访问到函数内监听对象的值，触发handler的get，执行收集依赖，相同的key放入同一个set集合,改变时在set函数内触发对应key的set集合的函数依次执行
->>>>>>> 80a59d6e253bb44accfd7e862edcee4836ea48f6
+
 ```js
 let {effectStacks}=require('./effect');//存储effect函数的栈接口数组
 let targetMap=new WeakMap();
@@ -193,21 +182,13 @@ export function trigger(target,type,key){//触发依赖执行
         } 
     }
 }
-<<<<<<< HEAD
-
-```
-
-### effect.ts
-存储effect栈数组，每次effect函数调用时都会往effect栈数组推入依赖的函数，然后执行一次effect内包裹的函数去触发proxy的get，再去触发收集依赖，以特定的格式收集存储该依赖，执行完毕后移除push的effect函数。
-
-```js
-=======
 
 ```
 #### effect.ts
+
 存储effect栈数组，每次effect函数调用时都会往effect栈数组推入依赖的函数，然后执行一次effect内包裹的函数去触发proxy的get，再去触发收集依赖，以特定的格式收集存储该依赖，执行完毕后移除push的effect函数。
+
 ```ts
->>>>>>> 80a59d6e253bb44accfd7e862edcee4836ea48f6
  let effectStacks:Array<Function>=[];
  function createReactiveEffect(fn:Function):void{
     let effect =function(){
@@ -232,11 +213,11 @@ export {
     effectStacks,
     effect
 };
-<<<<<<< HEAD
-=======
 ```
 ### 效果
+
 因为环境是ts构建，所以使用node去执行对应的代码
+
 ```ts
 import {reactive} from './reactive';
 import {effect } from './effect';
@@ -265,7 +246,6 @@ p1.name="CJI3";
 // effect2:CJI3
 
 
->>>>>>> 80a59d6e253bb44accfd7e862edcee4836ea48f6
 ```
 ### 效果
 
@@ -298,3 +278,224 @@ p1.name="CJI3";
 // effect1:CJI3
 // effect2:CJI3
 ```
+
+
+## @vue/composition-api
+
+从国庆节到现在还没听说vue3要彻底发布的消息，每天都迫不及待，终于在好奇心的驱使下去研究了一波composition-api的玩法，目前还没正式出vue3，在vue2项目中想要体验vue3的特性时需引入[@vue/composition-api](https://vue-composition-api-rfc.netlify.com/api.html#setup)
+
+
+### vue/cli3中使用vue/composition-api
+
+初始化cli3项目就不多说了，直接甩命令
+``` BASH
+npm install -g @vue/cli
+# OR
+yarn global add @vue/cli
+
+vue create vue3
+#创建项目
+
+cd vue3
+#进入目录
+
+yarn install
+#安装依赖
+
+npm run serve
+#开启服务
+
+```
+
+一个cli3的基础服务就跑好了，为了能使我们使用vue3的特性，接下来开始安装composition-api
+
+```BASH
+
+yarn add @vue/composition-api
+
+```
+
+安装后我们需要在vue项目中使用，需要引入@vue/composition-api，并使用vue的use 来安装
+
+``` js
+
+import Vue from 'vue';
+import App from './App.vue';
+import VueComponistionApi from '@vue/composition-api';//引入composition-api
+Vue.config.productionTip = false;
+Vue.use(VueComponistionApi);//安装插件
+new Vue({
+  render: h => h(App),
+}).$mount('#app');
+
+
+```
+
+接下来就能快乐的玩耍vue3的新特性了，首先来看看vue单文件结构的变化。
+
+## 构建一个todosAPP
+
+接下来我们来使用composition-api构建一个简单的todosAPP吧！！！
+
+### V1
+
+App.vue
+
+```html
+
+<template>
+  <div id="app">
+    <input type="text" v-model="state.value">
+    <button @click="addItem">点击增加</button>
+    <ul>
+      <li v-for="(item, idx) in state.todos" :key="idx">
+        {{ item.name }}
+        <span style="float:right" @click="finishItem(idx)"
+          >是否完成：{{ item.isFinished ? "是" : "否" }}</span
+        >
+      </li>
+    </ul>
+  </div>
+</template>
+<script>
+import { reactive, onMounted } from "@vue/composition-api";//引入composition-api
+
+export default {
+  setup() {//所有生命周期或者函数API等都在setUp中
+    onMounted(() => {//渲染完成，对应vue2mounted
+      console.log("mounted!");
+    });
+    const state = reactive({//将数据转换为响应式
+      todos: [],
+      value:''
+    });
+  const addItem=()=>{//添加代办项
+    state.todos.push({
+      isFinished:false,
+      name:state.value
+    });
+    state.value="";
+  }
+  const finishItem=(idx)=>{//完成代办
+    state.todos[idx].isFinished=true;
+  }
+  //return的元素可以直接在template中取到，可返回需要的函数和state对象
+    return {
+      state,
+      addItem,
+      finishItem
+    };
+  }
+};
+</script>
+
+<style>
+#app {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+</style>
+
+
+```
+
+这样一个简单的todosAPP就完成了，是不是总感觉和vue2有点相识，不是传说中vue3可以抽离逻辑代码吗，接下来我们修改一些代码，将我们的业务抽离出去
+
+### V2
+
+``` html
+
+<template>
+  <div id="app">
+    <input type="text" v-model="state.value" />
+    <button @click="addItem">点击增加</button>
+    <ul>
+      <li v-for="(item, idx) in state.todos" :key="idx">
+        {{ item.name }}
+        <span style="float:right" @click="finishItem(idx)"
+          >是否完成：{{ item.isFinished ? "是" : "否" }}</span
+        >
+      </li>
+    </ul>
+  </div>
+</template>
+<script>
+import { reactive, onMounted } from "@vue/composition-api";
+
+const useTodos = () => {//将业务抽成函数并返回业务需要的状态和函数
+  onMounted(() => {
+    console.log("mounted!");
+  });
+  const state = reactive({
+    todos: [],
+    value: ""
+  });
+  const addItem = () => {
+    state.todos.push({
+      isFinished: false,
+      name: state.value
+    });
+    state.value = "";
+  };
+  const finishItem = idx => {
+    state.todos[idx].isFinished = true;
+  };
+  return {//返回状态
+    state,
+    addItem,
+    finishItem
+  };
+};
+export default {
+  setup(props,content) {
+      console.log(props,content)
+    return {//必须返回视图层需要调用到的函数或者对象
+      ...useTodos(),
+      // ...useOthers()
+    };
+  }
+};
+</script>
+
+<style>
+#app {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+</style>
+
+
+```
+### props以及content
+
+* props的接收方式变了，vue2使用props对象来定义值的类型和默认值，vue3的props传递在setup函数的第一个参数
+* this没了，vue2中所有关于组件的状态都挂载在this对象下，vue3中setup函数的第二个参数传递的this对象
+
+```js
+
+export default {
+  setup(props,content) {//props和this
+      console.log(props,content)//
+    return {//必须返回视图层需要调用到的函数或者对象
+      ...useTodos(),
+      // ...useOthers()
+    };
+  }
+};
+
+```
+
+
+## 变化
+
+个人感觉总体没什么变化，以前很多旧的概念和API都能直接使用，如果真要说变化的地方，就像是作者说的那样，底层性能和虚拟DOM的优化等，有兴趣可以网上看看，对于开发者而言，能抽离业务逻辑好处真的太多太多了，而且也更大的扩展的vue的编码方式，自由度也更大了，周末快乐，做饭去了
+
+
