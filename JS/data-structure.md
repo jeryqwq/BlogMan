@@ -4,17 +4,398 @@ lang: en-US
 ---
 
 ## 栈
+    栈的
+```js
+// function Stack(){//version 1
+//     this.stackArr=[];
+//     this.push=(item)=>{
+//         this.stackArr.splice(0,0,item);
+//     }
+//     this.pop=()=>{
+//         this.stackArr.splice(0,1);
+//     }
+//     this.peek=()=>{
+//         return this.stackArr[this.stackArr.length-1];
+//     }
+//     this.isEmpty=()=>{
+//         return this.stackArr.length<=0;
+//     }
+// }
+function Stack(){ //version 2
+    const _item=Symbol("stack");
+    this.count=0;
+    this[_item]={};
+    this.push=item=>{
+        this.count++;
+        this[_item][this.count]=item;
+    }
 
+    this.pop=()=>{
+        const res=this[_item][this.count];
+        delete this[_item][this.count--];
+        return res;
+    }
+    this.peek=()=>{
+        return this[_item][this.count];
+    }
+    this.isEmpty=()=>{
+        return this.count===0;
+    }
+    this.toString=()=>{
+        let res='';
+        for(let i =this.count;i>=1;i--){
+           res+=this[_item][i];
+        }
+        return res;
+    }
+
+}
+// var stack=new Stack();//测试代码
+// stack.push(1);
+// stack.push(2);
+// stack.push(3);
+// stack.push(4);
+// stack.push(5);
+// console.log('删除最后一个',stack.pop());
+// console.log("最后一个值:",stack.peek());
+// console.log("toString",stack.toString());
+// console.log(stack.isEmpty());
+// var  sym=Object.getOwnPropertySymbols(stack);
+
+```
 ## 队列
 
+
+
 ## 链表
+```js
+function LinkedList() {
+    this.count = 0;
+    this.head = undefined;
+    this.remove=(element)=>{
+        const index=this.indexOf(element);
+        this.count--;
+        this.removeAt(index);
+    }
+    this.indexOf=(element)=>{
+        if(!element||!this.head ){
+            return;
+        }else{
+            let current=this.head;
+            for(let i =0;i<this.count;i++){
+                if(element===current.element.element){
+                    return i;
+                }
+                current=current.next;
+            }
+        }
+    }
+    this.insert=(element,index=0)=>{
+        if(!element||!this.head ||index < 0 || index > this.coun){
+            return;
+        }
+        let current=this.head,prev;
+        for(let i =0 ; i<index; i++){
+            prev=current;   
+            current=current.next;
+        }
+        prev.next=element;
+        element.next=current;
+        this.count++;
+        return this.head;
+    }
+    this.getElementAt = (index)=>{//获取下标索引的链表节点
+         if (!this.head || index < 0 || index > this.count) {
+            return;
+        }else{
+            let content,current=this.head;
+            for(let i=0;i<index;i++){
+                content=current;
+                current=current.next;
+            }   
+            return content
+        }
+    }
+    this.removeAt = (index)=>{
+        //移除某个节点
+        if (!this.head || index < 0 || index > this.count) {
+            return;
+        }
+        this.count--;
+        if (index === 0) {
+            this.head = this.head.next;
+        } else {
+            let current = this.head, prev;
+            for (let i = 1; i <= index; i++) {
+                prev = current;
+                //拿到上一次的指针引用
+                current = current.next;
+                //取到本次的node
+            }
+            prev.next = current.next;
+            //遍历完后说明已经走到了需要移除的索引下标位置，跳过一个node节点即可
+        }
+        return this.head;
+    }
+    this.push = (element)=>{
+        const node = new Node(element);
+        let current;
+        this.count = 1;
+        //初次push时
+        if (!this.head) {
+            //没有头指针指向第一个节点
+            this.head = node;
+        } else {
+            current = this.head;
+            while (current.next) {
+                this.count++;
+                current = current.next;
+            }
+            this.count++;
+            current.next = node;
+        }
+
+    }
+}
+function Node(element) {
+    this.element = element;
+    this.next = undefined;
+}
+var linkedList = new LinkedList();
+linkedList.push(new Node("Node1"))
+linkedList.push(new Node("Node2"))
+linkedList.push(new Node("Node3"))
+linkedList.push(new Node("Node4"))
+linkedList.push(new Node("Node5"))
+// linkedList.getElementAt(3);
+// linkedList.remove('Node5');
+// linkedList.indexOf('Node3');
+// linkedList.removeAt(2);
+// linkedList.insert(new Node('Node6'),2);
+
+```
 
 ### 双向链表
 
+```js
+
+function DoubleLinkedList(){
+    this.count=0;
+    this.head=undefined;
+    this.getElementAt=(index)=>{
+        if(index<0||index>this.count){return};
+        let current=this.head;
+        for(let i =1;i<this.count;i++){
+            current=current.next;
+            if(i===index){
+                return current;
+            }
+        }
+    }
+    this.removeAt=(index)=>{
+        if(index<0||index>this.count){return 0};
+        let current=this.head;
+        if(index==0){//第一个
+            this.head=this.head.next;
+            this.head.next.prev=undefined;
+        }else if(index===this.count){//最后一个
+            let node=this.getElementAt(index-2);
+            node.next=undefined;
+        }else{
+            let prevNode =this.getElementAt(index-1);
+            let currentNode=this.getElementAt(index);
+            let nextNode=this.getElementAt(index+1);
+            prevNode.next=nextNode;
+            nextNode.prev=prevNode;
+        }
+        this.count--;
+//         let current=this.head,prevNode;
+      
+    }
+    this.push=(node)=>{
+        if(!node){return};
+        this.count++;
+        if(!this.head){
+            this.head=node;
+        }else{
+            let current=this.head;
+            while (current.next){
+                current=current.next;
+            };
+            current.next=node;
+            node.prev=current;
+        }
+    };
+    this.insert=(node,index)=>{
+        if(index<0||index>this.count){return};
+        let current=this.head;
+        this.count++;
+        if(index==0){//第一个
+            node.next=this.head;
+            this.head=node;
+        }else if(index===this.count-1){//最后一个
+            while(current.next){
+                current=current.next;
+            }
+            current.next=node;
+            node.prev=current;
+        }else{
+            let nextNode,count=0;
+            while(current.next){
+                current=current.next;
+                if(count===index){
+                   node.prev=current;
+                   node.next=current.next;
+                   current.next=node;
+                   return;
+                }
+                count++;
+            }
+        }
+    }
+}
+
+function Node(element) {
+    this.element = element;
+    this.next = undefined;
+    this.prev=undefined;
+}
+var doubleLinkedList = new DoubleLinkedList();
+doubleLinkedList.push(new Node("Node0"))
+doubleLinkedList.push(new Node("Node1"))
+doubleLinkedList.push(new Node("Node2"))
+doubleLinkedList.push(new Node("Node3"))
+doubleLinkedList.push(new Node("Node4"))
+// doubleLinkedList.insert(new Node('headNode'),0);
+// doubleLinkedList.insert(new Node("LastNode"),6);
+// doubleLinkedList.insert(new Node("node2=>"),2);
+// doubleLinkedList.removeAt(2);
+// doubleLinkedList.getElementAt(2);
+```
 ## 树
 
 树是一种分层数据的抽象模型，从树的根节点出发，他有左子节点以及右子节点组成，其左子节点都会比自己的父节点来得小，右子节点相比父节点会来得大,相比我们常见的数组类似，树的结构更有利与查找树中的值以及删除和移动，而数组更方便的访问具体到某个下标元素，删除移动的性能消耗会相比树的代价更大
-
+```js
+function Tree(compareFn){
+    this.root=null;
+    this.compareFn=compareFn;
+    this.search=(key)=>{
+        return this.searchNode(this.root,key);
+    }
+    this.searchNode=(node,key)=>{
+        if(node){
+            if(node.key===key){
+                return true;
+            }
+            if(compareFn(node,key)){
+               node.right&&this.searchNode(node.right,key);
+            }else{
+               node.left&&this.searchNode(node.left,key);
+            }
+        }
+    }
+    this.max=()=>{
+        return this.maxNode(this.root);
+    }
+    this.maxNode=(node)=>{
+        let current=node.right;
+        while(current.right){
+            current=current.right;
+        }
+        return current;
+    }
+    this.min=()=>{
+        return this.minNode(this.root);
+    }
+    this.minNode=(node)=>{
+        let current=node;
+        while(current.left){
+            current=current.left;
+        }
+        return current;
+    }
+    this.inOrderTraverse=(callback)=>{
+        this.inOrderTranverseNode(this.root,callback);
+    }
+    this.preOrderTraverse=(callback)=>{
+        this.preOrderTraverseNode(this.root,callback);
+    }
+    this.preOrderTraverseNode=(node,callback)=>{
+        if(node){
+            callback(node);
+            this.preOrderTraverseNode(node.left,callback);
+            this.preOrderTraverseNode(node.right,callback);
+        }
+    }
+    this.inOrderTranverseNode=(node,callback)=>{
+        if(node){
+            this.inOrderTranverseNode(node.left,callback);
+            callback(node);
+            this.inOrderTranverseNode(node.right,callback);
+        }
+    }
+    this.insert=(key)=>{
+        if(!this.root){
+            let node =new Node(key);
+            this.root=node;
+        }else{
+            this.insertNode(this.root,key);
+        }
+    }
+    this.insertNode=(node,key)=>{
+        if(this.compareFn(node,key)){
+            if(!node.right){
+                node.right=new Node(key);
+            }else{
+                this.insertNode(node.right,key)
+            }
+        }else{
+            if(!node.left){
+                node.left=new Node(key);
+            }else{
+                this.insertNode(node.left,key)
+            }
+        }
+    }
+}
+function compareFn(node,key){
+    if(node.key>key){
+        return false;
+    }
+    return true;
+}
+function Node(key){
+    this.key=key;
+    this.left=null;
+    this.right=null;
+}
+var tree=new Tree(compareFn);
+tree.insert(11);
+tree.insert(7);
+tree.insert(15);
+tree.insert(5);
+tree.insert(3);
+tree.insert(9);
+tree.insert(8);
+tree.insert(10);
+tree.insert(13);
+tree.insert(12);
+tree.insert(14);
+tree.insert(20);
+tree.insert(18);
+tree.insert(25);
+tree.insert(6);
+// tree.inOrderTraverse((node)=>{
+//     console.log(node)
+// })
+// tree.preOrderTraverse((node)=>{
+//     console.log(node)
+// })
+tree.min();
+tree.max();
+var node=tree.search(25)
+console.log(123,node)
+```
 ### 节点
 
 每个节点都有 left 和 right 属性，表明该节点的左子节点和右子节点的指针。
@@ -22,7 +403,7 @@ lang: en-US
 然后我们要实现一些基本的增删改查的方法。
 
 - insert(key) 向树中插入新的键
-- search(key)查找到某个节点并返回
+- search(key) 查找到某个节点并返回
 - inOrderTraverse(callback) 中序遍历
 - prevOrderTraverse(callback) 先序遍历
 - postOrderTraverse(callback) 后序遍历
