@@ -5,24 +5,24 @@ module.exports = {
     nav: [
       {
         text: "前端",
-        link: "/"
+        link: "/",
       },
       {
         text: "时间安排",
-        link: "/nav/Time"
+        link: "/nav/Time",
       },
       {
         text: "阅读",
-        link: "/nav/Reading"
+        link: "/nav/Reading",
       },
       {
         text: "作品",
-        link: "/nav/MY"
+        link: "/nav/MY",
       },
       {
         text: "GitHub",
-        link: "https://github.com/jeryqwq"
-      }
+        link: "https://github.com/jeryqwq",
+      },
     ],
     sidebar: [
       {
@@ -35,16 +35,17 @@ module.exports = {
           "/Base/NODE",
           "/Base/Promise",
           "/Base/Render",
-          "/Base/Git"
-        ]
+          "/Base/Git",
+        ],
       },
       {
         title: "JS深入系列",
         children: [
           "/JS/design-mode",
           "/JS/review-question",
-          "/JS/data-structure"
-        ]
+          "/JS/data-structure",
+          "/JS/js-module",
+        ],
       },
       {
         title: "框架必知",
@@ -56,8 +57,8 @@ module.exports = {
           "/FrameWorkBase/reactRoute",
           "/FrameWorkBase/VueRouter",
           "/FrameWorkBase/reactPublicState",
-          "/FrameWorkBase/VueState"
-        ]
+          "/FrameWorkBase/VueState",
+        ],
       },
       {
         title: "框架",
@@ -67,21 +68,21 @@ module.exports = {
           "/FrameWork/Vue3",
           "/FrameWork/React",
           "/FrameWork/ReactHooks",
-          "/FrameWork/Koa"
-        ]
+          "/FrameWork/Koa",
+        ],
       },
       {
         title: "数据库",
-        children: ["/DataBase/Mongod", "/DataBase/MySQL"]
+        children: ["/DataBase/Mongod", "/DataBase/MySQL"],
       },
       {
         title: "前端大杂烩",
         children: [
           "/Others/AntdForm",
           "/Others/PrivateNpm",
-          "/Others/IceFusion"
-        ]
-      }
-    ]
-  }
+          "/Others/IceFusion",
+        ],
+      },
+    ],
+  },
 }
