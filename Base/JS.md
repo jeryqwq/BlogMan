@@ -796,7 +796,7 @@ console.log(result) //[1, 2, 3, 4, 5, 6]
 ```js
 //闭包
 function test(){
-  let a=
+  let a = 
 
 }
 ```
