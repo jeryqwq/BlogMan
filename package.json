@@ -2,5 +2,8 @@
     "scripts": {
         "dev": "vuepress dev",
         "build": "vuepress build"
-      }
+    },
+    "dependencies": {
+        "vue-begin-gride": "^1.0.2"
+    }
 }

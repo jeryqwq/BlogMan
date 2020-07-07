@@ -81,6 +81,7 @@ module.exports = {
           "/Others/AntdForm",
           "/Others/PrivateNpm",
           "/Others/IceFusion",
+          "/Others/vue-begin-gride",
         ],
       },
     ],
