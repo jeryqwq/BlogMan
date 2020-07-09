@@ -4,6 +4,6 @@
         "build": "vuepress build"
     },
     "dependencies": {
-        "vue-begin-gride": "^1.0.3"
+        "vue-begin-gride": "^1.0.5"
     }
 }

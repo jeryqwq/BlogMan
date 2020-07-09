@@ -37,7 +37,7 @@ npm i vue-begin-gride -s
 </template>
 
 <script>
-import PointTool from "vue-begin-gride"
+import PointTool from "./../src/index"
 export default {
   components: {
     PointTool,
@@ -52,11 +52,14 @@ export default {
       {
         el: this.$refs.text,
         width: "500px",
+        style: "border:3px red solid",
+        padding: 5,
         text:
           "第一步，输入您的在网站已经注册过的用户名信息，用户名长度应该在6-20位之前",
       },
       {
         el: this.$refs.password,
+        padding: 4,
         width: "300px",
         text: () => (
           <span style="color:white;width:500px">
@@ -66,7 +69,6 @@ export default {
       },
       {
         el: this.$refs.login,
-        lineStyle: "stroke:red",
         text: () => (
           <span style="color:white">
             "点击登录：输入您以及注册过的用户名和密码，即可登录该系统！！",
@@ -75,6 +77,7 @@ export default {
       },
       {
         el: this.$refs.end,
+        padding: 20,
         text: () => (
           <span style="color:white">
             "第四步就会出现一个下次不再提示改选择，将状态存入session，勾选后第二次刷新页面将不再展示！",
