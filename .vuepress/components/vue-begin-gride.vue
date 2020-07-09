@@ -20,7 +20,6 @@ export default {
     this.lists = [
       {
         el: document.querySelectorAll(".page p")[0],
-        width: "600px",
         padding: 12,
         text: () => (
           <div style="color:white">
@@ -29,7 +28,6 @@ export default {
               ListItem配置:
               <br />
               el: document.querySelectorAll(".page p")[0], <br />
-              width: "600px",
               <br />
               padding: 12,
               <br />
