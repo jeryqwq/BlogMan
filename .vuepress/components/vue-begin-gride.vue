@@ -29,6 +29,7 @@ export default {
         style: "border:solid 5px red;border-radius:20px;background:white",
         text: () => (
           <div style="color:#333;padding:20px 10px  10px 10px">
+            <h3>自定义渲染</h3>
             "第er步：使用npm安装插件，卡顿可切换到cnpm淘宝源（npm install -g
             cnpm --registry=https://registry.npm.taobao.org
             ）,也可以使用nrm管理你的源！----这是jsx渲染的DOM自定义节点，如果不需要外部的虚线边框，可以配置list.style属性覆盖掉默认样式"
@@ -39,7 +40,7 @@ export default {
         el: document.querySelectorAll(".page p")[1],
         lineStyle: "stroke-width:5px",
         text:
-          "这里是使用的说明详情，下面是基本模版代码，可直接赋值到你的项目查看demo并根据API作出适当的调整适配你自己的项目！(使用自定义lineStyle属性给弧线设置svg格式的线条样式，更多请查看官方文档)",
+          "自定义线条-----这里是使用的说明详情，下面是基本模版代码，可直接赋值到你的项目查看demo并根据API作出适当的调整适配你自己的项目！(使用自定义lineStyle属性给弧线设置svg格式的线条样式，更多请查看官方文档)",
       },
       {
         el: document.querySelectorAll(".page .language-vue")[1],

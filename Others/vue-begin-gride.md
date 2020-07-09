@@ -93,15 +93,13 @@ export default {
 
 | 参数             |        类型        | 默认值                                                    | 是否必填 | 说明                                                |
 | ---------------- | :----------------: | --------------------------------------------------------- | -------- | --------------------------------------------------- |
-| opacity          |       Number       | 0.3                                                       | false    | 背景透明度,请输入 0-1 之间的小数                    |
+| opacity          |       Float        | 0.3                                                       | false    | 背景透明度,请输入 0-1 之间的小数                    |
 | [list]           |       Array        | null                                                      | true     | 每个遮罩层的信息                                    |
 | [list].el        |        Node        |                                                           | true     | 节点的 DOM 对象，请在 mounted 的函数中赋值调用      |
 | [list].width     |       string       | 默认跟随 el 宽度                                          | false    | 当给定一个固定宽度时请使用 string 类型的 px 宽度    |
 | [list].style     |    style-string    | color:white;border-radius: 20px;;border:dashed 2px white; | false    | 提示区域自定义样式，默认 2 像素虚线白色边框，可覆盖 |
 | [list].text      | Function or String |                                                           | true     | 提示区域内容，可传入字符串或者 jsx 渲染函数         |
 | [list].lineStyle |       string       | "stroke-dasharray: 5px 5px;stroke-width:2px"              | false    | 链接线条的 svg 样式，详情请阅读 svg 文档            |
+| [list].padding   |       Number       | 10                                                        | false    | 遮罩层相对 DOM 节点的 padding 值                    |
 
 <vue-begin-gride />
-## 自定义渲染节点
-
-##
