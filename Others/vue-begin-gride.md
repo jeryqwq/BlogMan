@@ -3,6 +3,7 @@ title: 新手指引组件
 lang: en-US
 ---
 
+
 ## 开始
 
 新手指引常用于网站首页以及 APP 欢迎页面，之前的引导页面太死了，有些还是设计师切图的 png 图片，发现切图太死板太浪费性能了，每次一个调整都要重新切图，完全做不到自定义，而且要考虑屏幕宽高，窗体出现滚动条根本又得动态定位，而且一个这个东西要占我好几百 k 的资源，所以就花了点时间研究了下具体的实现方式，用 svg 实现了相应的功能，还做了滑屏处理，防止引导元素超出可视化范围内看不到提示语。
@@ -14,6 +15,26 @@ npm i vue-begin-gride -s
 ```
 
 ### 使用
+##### 注册插件
+```js
+import beginGride from "vue-begin-gride"
+Vue.use(beginGride)
+```
+##### 使用
+``` js
+  this.$guide({
+    list: [
+      {
+        el: this.$refs.login,
+        width: "500px",
+        lineStyle: "stroke:red",
+        padding: 6,
+        text:
+          "第一步，输入您的在网站已经注册过的用户名信息，用户名长度应该在6-20位之前",
+      }
+    ]
+  })
+```
 
 在 vue 中一定要等待 dom 渲染完成再给 list 数组的每一个 el 对象赋值，否则无法找到 dom，所以在请在 mounted 函数中获取到每个 ref 的 dom 节点或者通过其他 api 找到的节点对象
 
@@ -22,7 +43,6 @@ npm i vue-begin-gride -s
 ```vue
 <template>
   <div style="">
-    <PointTool :lists="lists" :opacity="0.7" />
     <div style="margin-left: 100px;">
       <input type="text" ref="text" placeholder="请输入用户名" />
       <input type="text" ref="password" placeholder="请输入密码" />
@@ -37,7 +57,9 @@ npm i vue-begin-gride -s
 </template>
 
 <script>
-import PointTool from "./../src/index"
+import VueBeginGride from "vue-begin-gride"
+import Vue from 'vue'
+Vue.use(VueBeginGride)
 export default {
   components: {
     PointTool,
@@ -85,11 +107,14 @@ export default {
         ),
       },
     ]
+    this.$guide({
+      lists: this.lists,
+      opacity: 0.2
+    })
   },
 }
 </script>
 ```
-
 :::
 
 ## API 说明
@@ -106,3 +131,16 @@ export default {
 | [list].padding   |       Number       | 10                                                        | false    | 遮罩层相对 DOM 节点的 padding 值                    |
 
 <vue-begin-gride />
+
+```bash
+vue serve test/边界固定.vue
+vue serve test/normal.vue
+```
+
+## publish
+
+```bash
+vue build --target lib --name main './src/index.js'
+npm publish
+```
+

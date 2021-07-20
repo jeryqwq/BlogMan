@@ -1,6 +1,6 @@
 module.exports = {
-  title: "Blog Honor",
-  description: "曾今我也以为梦想遥不可及",
+  title: "小陈小陈，心想事成",
+  description: "一本正经的学习",
   themeConfig: {
     nav: [
       {
@@ -83,6 +83,10 @@ module.exports = {
           "/Others/IceFusion",
           "/Others/vue-begin-gride",
         ],
+      },
+      {
+        title: "三大浪漫",
+        children: ["/romantics/compile", "/romantic/system"，"/romantic/graphics]
       },
     ],
   },
