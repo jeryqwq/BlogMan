@@ -86,7 +86,7 @@ module.exports = {
       },
       {
         title: "三大浪漫",
-        children: ["/romantics/compile", "/romantic/system"，"/romantic/graphics]
+        children: ["/romantics/compile", "/romantics/system","/romantics/graphics"]
       },
     ],
   },
