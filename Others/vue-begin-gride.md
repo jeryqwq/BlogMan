@@ -61,9 +61,6 @@ import VueBeginGride from "vue-begin-gride"
 import Vue from 'vue'
 Vue.use(VueBeginGride)
 export default {
-  components: {
-    PointTool,
-  },
   data() {
     return {
       lists: [],
@@ -116,6 +113,7 @@ export default {
 </script>
 ```
 :::
+<vue-begin-gride />
 
 ## API 说明
 
@@ -130,7 +128,6 @@ export default {
 | [list].lineStyle |       string       | "stroke-dasharray: 5px 5px;stroke-width:2px"              | false    | 链接线条的 svg 样式，详情请阅读 svg 文档            |
 | [list].padding   |       Number       | 10                                                        | false    | 遮罩层相对 DOM 节点的 padding 值                    |
 
-<vue-begin-gride />
 
 ```bash
 vue serve test/边界固定.vue
