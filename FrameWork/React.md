@@ -173,7 +173,7 @@ class App extends React.Component{
       )
     }
   }
-  function mixinFunction(WrapComponent){//手写基于React的mixins功能
+  function mixinFunction(WrapComponent){//简易实现基于React的mixins功能
     let prevFn=WrapComponent.prototype.componentDidMount;//暂存componentDidMount函数
     WrapComponent.prototype.componentDidMount=function(){//重写该函数，此处不能使用
     //箭头函数，否则this指向mixinFunction

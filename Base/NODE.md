@@ -55,4 +55,4 @@ if(ENV==='pro'){
 ```
 ## 命令配置
 ## 搭建脚手架
-## 手写(webpack)Cli工具
+## 简易实现(webpack)Cli工具

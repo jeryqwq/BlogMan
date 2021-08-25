@@ -3,7 +3,7 @@ title: 动手实现Antd表单组件-React
 lang: en-US
 ---
 ## 前言
-从零开始手写一个与[And Design](https://ant.design/components/form-cn/)语法一致的表单组件，包括表单格式验证，输入提示，表单数据获取，表单判断等。使用前请自行按照官方搭建好脚手架。(未使用TypeScript构建)
+从零开始简易实现一个与[And Design](https://ant.design/components/form-cn/)语法一致的表单组件，包括表单格式验证，输入提示，表单数据获取，表单判断等。使用前请自行按照官方搭建好脚手架。(未使用TypeScript构建)
 ## Ant Design Form表单
 先看看官方表单的用法
 ```js
@@ -84,7 +84,7 @@ ReactDOM.render(<WrappedNormalLoginForm />, mountNode);
 create-react-app入口文件
 ```js
 import React from 'react';
-import Form from './Form';//导入手写的Form组件
+import Form from './Form';//导入简易实现的Form组件
  class App extends React.Component {
    constructor(props){
      super(props)

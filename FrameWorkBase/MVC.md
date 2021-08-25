@@ -114,7 +114,7 @@ var El=<div>123</div>;
 var El = React.createElement("div", null, "item");
 var Ell = React.createElement(El, null, "123");
 ```
-## 手写React
+## 简易实现React
 基于上面这些特性，我们就能写出一个拥有上述功能的的react。
 ### 文件描述
 使用webpack(ESModul语法)构建,自行手动搭建好webpack运行环境。

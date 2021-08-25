@@ -31,7 +31,7 @@ lang: en-US
   <img :src="$withBase('./../imgs/system1.png')" >
   按键与内存中的按键缓冲区映射， 用户按下按键后会产生中断，操作系统接管了CPU中断，感知到用户按下某按键 => 发送EVENT事件至各大APP
   `Ring Buffer（键盘缓冲区）: 记录键盘按下的key的顺序，是一个环状且超出覆盖的缓冲区， 系统卡顿的时候按下多个按键操作系统会滴滴滴的叫,因为ring buffer满了`
-2. 管理和调度应用
+2. 管理和调度应用:
   抽象 ｜ 隔离 ｜ 管理 ｜ 调度
     <br>
 
@@ -48,7 +48,7 @@ lang: en-US
      调度
     ```系统级别的进程肯定优先于用户的进程```
 
-3. 用户可以管理操作系统
+3. 用户可以管理操作系统:
   文件，app， UI，分辨率设置，开机密码， shell等
 
 ###  总结
@@ -89,3 +89,56 @@ lang: en-US
     <br>
 
 `所以，进程是一种数据结构，是一张能描述以上信息的表`
+
+### C++ 创建进程
+#### fork函数
+fork调用的一个奇妙之处就是它仅仅被调用一次，却能够返回两次，它可能有三种不同的返回值：
+1. 在父进程中，fork返回新创建子进程的进程ID；
+2. 在子进程中，fork返回0；
+3. 如果出现错误，fork返回一个负值；
+  ``` c
+  // file test.c
+#include <stdio.h>
+#include <unistd.h>
+int main() {
+  pid_t pid = fork();
+  if ( pid == 0) {
+    printf("i am child\n");
+    return 1;
+  }
+  printf("i am parent");
+  return 0;
+}
+  ```
+
+使用gcc编译后生成a.out文件(相关编译模块的可以移步到编译原理查看)
+  ```bash
+  gcc ./test.c # 直接编译成可执行文件， 跳过gcc四步骤(...汇编，机器码)
+  ```
+  基于上述特性，我们将代码拆分开
+  ```c
+#include <stdio.h>
+#include <unistd.h>
+int main() {
+  pid_t pid = fork(); // fork调用后会重新冲改行开始开启一个进程去执行之后的代码
+
+  // 父进程内， pid不等于0, 故不进入if
+  if ( pid == 0) {
+    printf("i am child\n");
+    return 1;
+  }
+  printf("i am parent"); // 执行后返回
+  return 0;
+
+// 子进程
+  if ( pid == 0) { // 子进程中pid = 0，进入if
+    printf("i am child\n");
+    return 1; //返回
+  }
+  printf("i am parent"); //不执行
+  return 0;
+
+}
+  ```
+
+所以上述代码会先打印parent后打印child

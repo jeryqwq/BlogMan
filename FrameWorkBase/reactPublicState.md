@@ -58,7 +58,7 @@ store.dispatch({ type: 'DECREMENT' });
 // 1
 ```
 react-redux动态更新就是store被dispatch后调用指定的组件进行状态刷新，实现多个组件之间共享状态。
-## 手写简易的React-Redux
+## 简易实现简易的React-Redux
 ###  效果预览
 ---
 <img :src="$withBase('./../imgs/redux.gif')" alt="redux效果预览图">

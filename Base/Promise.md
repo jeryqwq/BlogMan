@@ -190,7 +190,7 @@ test();
 前面就只是单纯的定义而已，直接看后面的async函数，执行test之前有一个console(beign)，
 然后等待promise1返回结果，promise1内同步代码enter promise先打印，返回的promise中，reslove之前的代码也是同步的，所以打印promise1 exec，两秒后调用reslove，此时执行等待result2，打印同步的enter promise2和promise2exec，过两秒后答应2秒后和3秒后
 
-## 手写一个Promise
+## 简易实现一个Promise
 ### Promise 规范
 * Promise有三种状态。
 * 执行中遇到错误执行then回调中的第二个rejectCallBack传递错误参数。
