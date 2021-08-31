@@ -283,5 +283,115 @@ nasm hello.s -o system.img
 ```bash
 qemu-system-i386 -hdd hello.img 
 ```
-然后就能看到基于我们上面的汇编语言实现的操作系统以及运行起来了(现实可不是这样，一个操作系统的内核代码至少都是几百m，往往软盘加载的只是一个内核加载器)。
-接下来我们可以实现图形化界面，鼠标，命令行工具，抽象出上述操作系统的一些概念，如线程，进程，中断，文件系统等，路漫漫其修远兮。
+### 加载软盘数据
+
+模拟3.5寸软盘，它有两个盘面 因此就对应两个磁头 每个盘面有80个磁道 也就是柱面 编号分别为0-79 每个柱面都有18个扇区 编号分别为1-18 所以一个盘面可以存储的数据量大小为：
+512 * 18 * 80
+一个软盘有两个盘面，因此一个软盘可以存储的数据为：
+2 * 512 * 18 * 80 = 1474560 Byte = 1440 KB = 1.5M
+<br>
+
+使用汇编语言指定操作系统启动后读取制定位置软盘数据
+```
+org  0x7c00;
+
+jmp  entry
+db   0x90
+DB   "OSKERNEL"
+DW   512
+DB   1
+DW   1
+DB   2
+DW   224
+DW   2880
+DB   0xf0
+DW   9
+DW   18
+DW   2
+DD   0
+DD   2880
+DB   0,0,0x29
+DD   0xFFFFFFFF
+DB   "MYFIRSTOS  "
+DB   "FAT12   "
+RESB  18
+
+entry:
+    mov  ax, 0
+    mov  ss, ax
+    mov  ds, ax
+    mov  es, ax
+    mov  si, msg
+
+
+readFloppy:
+    mov          CH, 1        ;CH 用来存储柱面号
+    mov          DH, 0        ;DH 用来存储磁头号
+    mov          CL, 2        ;CL 用来存储扇区号
+
+    mov          BX, msg       ; ES:BX 数据存储缓冲区
+
+    mov          AH, 0x02      ;  AH = 02 表示要做的是读盘操作
+    mov          AL,  1        ; AL 表示要练习读取几个扇区
+    mov          DL, 0         ;驱动器编号，一般我们只有一个软盘驱动器，所以写死   
+                               ;为0
+    INT          0x13          ;调用BIOS中断实现磁盘读取功能
+
+    jc           error
+
+putloop:
+    mov  al, [si]
+    add  si, 1
+    cmp  al, 0
+    je   fin
+    mov  ah, 0x0e
+    mov  bx, 15
+    int  0x10
+    jmp  putloop
+
+
+
+fin:
+    HLT
+    jmp  fin
+
+error:
+    mov si, errmsg
+    jmp   putloop
+
+msg:
+    RESB   64
+errmsg:
+    DB "error"
+```
+这时我们就可以运行`nasm target.s -o base.img `生成base.img文件了，但这个文件没有我们要写入的软盘的数据。
+<br/>
+#### 使用node对软盘数据进行写入
+```js
+const fs = require('fs')
+const bufferInit = new ArrayBuffer(2 * 512 * 18 * 80) // 初始化软盘数据, 2个盘面*80个磁道*18个扇区*扇区大小512k
+const panel = new Uint8Array(bufferInit)
+const msg = "This is a text from cylinder 1 and sector 2"
+fs.readFile('./8-31/base.img',{}, (err, buffer) => {
+  const arr = new Uint8Array(buffer) // 转换为数组进行二进制操作
+  arr.forEach((item, idx) => {
+    panel[idx] = item
+  })
+   //第一个柱面第二个扇区存入我们的数据
+  const startLoction =  18944 // 数据起始位置
+  for(let i =0; i<msg.length; i++){
+    const charCode = msg[i].charCodeAt() // 获取字符串的charcode
+    panel[startLoction + i] = charCode // 写入对应的软盘中
+  }
+  // 保存
+  fs.writeFile('./8-31/system.img',panel , 'binary', function(err) {
+  
+  })
+})
+
+```
+这时使用quem区运行我们生成的system.img文件`qemu-system-i386 -hdd system.img  `
+
+<br/>
+然后就能看到基于我们上面的汇编语言实现的操作系统以及运行起来了。
+接下来就要引入c语言环境，然后就可以基于C语言实现图形化界面，鼠标，命令行工具，抽象出上述操作系统的一些概念，如线程，进程，中断，文件系统等。
