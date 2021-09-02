@@ -199,9 +199,12 @@ return 0;
 <a href="https://github.com/yourtion/30dayMakeOS">30天实现一个操作系统
 </a>
 <br>
+<a href="https://wdkang.top/2021/01/26/">MAC30天实现一个操作系统
+</a>
+<br>
 <a href="https://github.dev/yourtion/30dayMakeOS">vscode模式
 </a>
-## 汇编语言
+## 第一天 hello word
 ### 了解汇编
 汇编语言，是除了机器语言外的最底层的编程语言了。了解这门语言，可以帮助我们更加深入地理解CPU、内存等硬件的工作原理。用机器的思维去操作计算机。汇编语言和机器语言是一一对应的，汇编语言被编译成机器语言，这样的程序执行效率更高。
 使用编译器，可以把汇编程序转译成机器指令程序。举例如下：
@@ -283,7 +286,7 @@ nasm hello.s -o system.img
 ```bash
 qemu-system-i386 -hdd hello.img 
 ```
-### 加载软盘数据
+## 第二天 加载软盘数据
 
 模拟3.5寸软盘，它有两个盘面 因此就对应两个磁头 每个盘面有80个磁道 也就是柱面 编号分别为0-79 每个柱面都有18个扇区 编号分别为1-18 所以一个盘面可以存储的数据量大小为：
 512 * 18 * 80
@@ -292,7 +295,7 @@ qemu-system-i386 -hdd hello.img
 <br>
 
 使用汇编语言指定操作系统启动后读取制定位置软盘数据
-```
+```asm
 org  0x7c00;
 
 jmp  entry
@@ -377,17 +380,17 @@ fs.readFile('./8-31/base.img',{}, (err, buffer) => {
   arr.forEach((item, idx) => {
     panel[idx] = item
   })
-   //第一个柱面第二个扇区存入我们的数据
-  const startLoction =  18944 // 数据起始位置
+   //第一个柱面第二个扇区存入我们的数据 
+  const startLoction =   512*18*2 + 512
   for(let i =0; i<msg.length; i++){
-    const charCode = msg[i].charCodeAt() // 获取字符串的charcode
-    panel[startLoction + i] = charCode // 写入对应的软盘中
+    const charCode = msg[i].charCodeAt()
+    panel[startLoction + i] = charCode
   }
-  // 保存
   fs.writeFile('./8-31/system.img',panel , 'binary', function(err) {
   
   })
 })
+
 
 ```
 这时就能生成写入我们自己数据的软盘了，然后使用第三方虚拟机导入该软盘，就可以看到
@@ -395,7 +398,107 @@ fs.readFile('./8-31/base.img',{}, (err, buffer) => {
 ```被坑了三天，找来找去一直找不到原因，后来发现时虚拟机新建的时候随便选了win7，导致加载软驱一直异常，后来换了linux版就正常了```
 <img :src="$withBase('./../imgs/system4.png')" />
 
-### 突破512限制
+## 第三天 引导内核
+我们的系统内核,必须在虚拟软盘的第一扇区,但第一个扇区只有512个字节
+因此 系统内核不能超过512个字节，在实际的操作系统中，往往软驱只是一个入口，承担一个内核加载器的作用，然后跳转到内核的加载地址。
+所以，我们需要制作一个boot.asm去实现引导作用
+```asm
+org  0x7c00;
 
-然后就能看到基于我们上面的汇编语言实现的操作系统以及运行起来了。
+LOAD_ADDR  EQU  0X8000
+
+entry:
+    mov  ax, 0
+    mov  ss, ax
+    mov  ds, ax
+    mov  es, ax
+    mov  si, ax
+
+readFloppy:
+    mov          CH, 1        ;CH 用来存储柱面号
+    mov          DH, 0        ;DH 用来存储磁头号
+    mov          CL, 2        ;CL 用来存储扇区号
+
+    mov          BX, LOAD_ADDR       ; ES:BX 数据存储缓冲区
+
+    mov          AH, 0x02      ;  AH = 02 表示要做的是读盘操作
+    mov          AL,  1        ; AL 表示要练习读取几个扇区
+    mov          DL, 0         ;驱动器编号，一般我们只有一个软盘驱动器，所以写死   
+                               ;为0
+    INT          0x13          ;调用BIOS中断实现磁盘读取功能
+
+    JC           fin
+
+    jmp          LOAD_ADDR
+
+
+
+fin:
+    HLT
+    jmp  fin
+
+```
+编译为二进制文件boot.img
+```bash
+nasm ./boot.s -o boot.img
+```
+然后我们再把内核需要执行的代码分开编译到另一个文件
+```
+org   0x8000
+
+entry:
+    mov  ax, 0
+    mov  ss, ax
+    mov  ds, ax
+    mov  es, ax
+    mov  si, msg
+
+
+ putloop:
+    mov  al, [si]
+    add  si, 1
+    cmp  al, 0
+    je   fin
+    mov  ah, 0x0e
+    mov  bx, 15
+    int  0x10
+    jmp  putloop
+
+fin:
+    HLT
+    jmp  fin
+
+  msg:
+     DB   "This is Hello World from kernel"
+```
+继续执行编译为二进制文件kernel.img
+```bash
+nasm ./kernel.s -o kernel.img
+```
+ 这时就有两个文件， 一个是基础的加载引导文件程序， 一个是内核代码，我们需要用node对其进行重新生成一个文件，且将内核代码写入道制定的扇区（第1柱面 第2扇区）
+ ```js
+
+const fs = require('fs')
+const bufferInit = new ArrayBuffer(2 * 512 * 18 * 80) // 初始化软盘数据, 2个盘面*80个磁道*18个扇区*扇区大小512k
+const panel = new Uint8Array(bufferInit)
+fs.readFile('./9-2/boot.img', {}, (err, buff) =>{ // 内核引导
+  const sysBuffer = new Uint8Array(buff) 
+  fs.readFile('./9-2/kernel.img',{}, (err, buffer) => { // 内核代码
+    const arr = new Uint8Array(buffer) // 转换为数组进行二进制操作
+    sysBuffer.forEach((item, idx) => { // 写入内核引导代码
+      panel[idx] = item
+    })
+     //第一个柱面第二个扇区存入我们的数据 512*18*2 + 512
+    const startLoction =   512*18*2 + 512
+    for(let i =0; i<arr.length; i++){ // 写入内核代码
+      panel[startLoction + i] = arr[i]
+    }
+    fs.writeFile('./9-2/system.img',panel , 'binary', function(err) {
+    })
+  })
+})
+ ```
+ 执行后生成system.img后就可以通过虚拟机加载软盘，执行我们内核部分的代码打印了 ```This is Hello World from kerne```
+<img :src="$withBase('./../imgs/system5.png')" />
+ 
 接下来就要引入c语言环境，然后就可以基于C语言实现图形化界面，鼠标，命令行工具，抽象出上述操作系统的一些概念，如线程，进程，中断，文件系统等。
