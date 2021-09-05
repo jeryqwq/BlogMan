@@ -501,4 +501,199 @@ fs.readFile('./9-2/boot.img', {}, (err, buff) =>{ // 内核引导
  执行后生成system.img后就可以通过虚拟机加载软盘，执行我们内核部分的代码打印了 ```This is Hello World from kerne```
 <img :src="$withBase('./../imgs/system5.png')" />
  
+ ## 第四天 保护模式启动
+主要解决内存寻址的问题，从1M(2^20)到4GB(2^32)
+因为早起都是实模式，dos界面，在实模式下，cpu只能处理最多16位的数据，同时地址总线也就20位，因此能访问的最大内存也就2^20 字节，也就是1M多，在保护模式下，cpu可以处理32位的数据，同时地址总线也扩张到32位，这样，cpu能访问的内存就可以一下子达到4G，开始支持图形化界面
+
+boot.s
+操作系统启动并读取上一章节制定软盘内的内容并执行
+```js
+org  0x7c00;
+
+LOAD_ADDR  EQU  0X9000
+
+jmp  entry
+db   0x90
+DB   "OSKERNEL"
+DW   512
+DB   1
+DW   1
+DB   2
+DW   224
+DW   2880
+DB   0xf0
+DW   9
+DW   18
+DW   2
+DD   0
+DD   2880
+DB   0,0,0x29
+DD   0xFFFFFFFF
+DB   "MYFIRSTOS  "
+DB   "FAT12   "
+RESB  18
+
+entry:
+    mov  ax, 0
+    mov  ss, ax
+    mov  ds, ax
+    mov  es, ax
+    mov  si, ax
+
+
+readFloppy:
+    mov          CH, 1        ;CH 用来存储柱面号
+    mov          DH, 0        ;DH 用来存储磁头号
+    mov          CL, 2        ;CL 用来存储扇区号
+
+    mov          BX, LOAD_ADDR       ; ES:BX 数据存储缓冲区
+
+    mov          AH, 0x02      ;  AH = 02 表示要做的是读盘操作
+    mov          AL,  1        ; AL 表示要练习读取几个扇区
+    mov          DL, 0         ;驱动器编号，一般我们只有一个软盘驱动器，所以写死   
+                               ;为0
+    INT          0x13          ;调用BIOS中断实现磁盘读取功能
+   
+    JC           fin
+
+    jmp          LOAD_ADDR
+
+
+
+fin:
+    HLT
+    jmp  fin
+```
+然后使用```nasm boot.s -o boot.img```生成boot.img镜像文件
+新建kernel.s，即boot.s执行跳转的地方，include导入pm.inc的内容，pm.inc类似于用另一种的数据结构区存储内存地址的引用，所以当访问某个地址时会先拿到其存储的内容后才能访问到具体的地址。
+  ```js
+  %include "pm.inc"
+
+org   0x9000
+
+jmp   LABEL_BEGIN
+
+[SECTION .gdt]
+ ;                                  段基址          段界限                属性
+LABEL_GDT:          Descriptor        0,            0,                   0  
+LABEL_DESC_CODE32:  Descriptor        0,      SegCode32Len - 1,       DA_C + DA_32
+LABEL_DESC_VIDEO:   Descriptor     0B8000h,         0ffffh,            DA_DRW
+
+GdtLen     equ    $ - LABEL_GDT
+GdtPtr     dw     GdtLen - 1
+           dd     0
+
+SelectorCode32    equ   LABEL_DESC_CODE32 -  LABEL_GDT
+SelectorVideo     equ   LABEL_DESC_VIDEO  -  LABEL_GDT
+
+[SECTION  .s16]
+[BITS  16]
+LABEL_BEGIN:
+     mov   ax, cs
+     mov   ds, ax
+     mov   es, ax
+     mov   ss, ax
+     mov   sp, 0100h
+
+     xor   eax, eax
+     mov   ax,  cs
+     shl   eax, 4
+     add   eax, LABEL_SEG_CODE32
+     mov   word [LABEL_DESC_CODE32 + 2], ax
+     shr   eax, 16
+     mov   byte [LABEL_DESC_CODE32 + 4], al
+     mov   byte [LABEL_DESC_CODE32 + 7], ah
+
+     xor   eax, eax
+     mov   ax, ds
+     shl   eax, 4
+     add   eax,  LABEL_GDT
+     mov   dword  [GdtPtr + 2], eax
+
+     lgdt  [GdtPtr]
+
+     cli   ;关中断
+
+     in    al,  92h
+     or    al,  00000010b
+     out   92h, al
+
+     mov   eax, cr0
+     or    eax , 1
+     mov   cr0, eax
+
+     jmp   dword  SelectorCode32: 0
+
+     [SECTION .s32]
+     [BITS  32]
+LABEL_SEG_CODE32:
+    mov   ax, SelectorVideo
+    mov   gs, ax
+    mov   si, msg
+    mov   ebx, 10
+    mov   ecx, 2
+showChar:
+    mov   edi, (80*11)
+    add   edi, ebx
+    mov   eax, edi
+    mul   ecx
+    mov   edi, eax
+    mov   ah, 0ch
+    mov   al, [si]
+    cmp   al, 0
+    je    end
+    add   ebx,1
+    add   si, 1
+    mov   [gs:edi], ax
+    jmp    showChar
+end: 
+    jmp   $
+    msg:
+    DB     "Protect Mode", 0
+
+SegCode32Len   equ  $ - LABEL_SEG_CODE32
+  ```
+pm.inc
+```
+%macro Descriptor 3
+    dw    %2  &  0FFFFh
+    dw    %1  &  0FFFFh
+    db   (%1>>16) & 0FFh
+    dw   ((%2 >> 8) & 0F00h) | (%3 & 0F0FFh)
+    db   (%1 >> 24) & 0FFh
+%endmacro
+
+
+DA_32       EQU 4000h   ; 32 位段
+DA_C        EQU 98h ; 存在的只执行代码段属性值
+DA_DRW      EQU 92h ; 存在的可读写数据段属性值
+```
+```nasm kernel.s -o kernel.img```继续生成镜像文件
+
+继续使用node生成镜像文件
+```js
+const fs = require('fs')
+const bufferInit = new ArrayBuffer(2 * 512 * 18 * 80) // 初始化软盘数据, 2个盘面*80个磁道*18个扇区*扇区大小512k
+const panel = new Uint8Array(bufferInit)
+fs.readFile('./9-4/boot.img', {}, (err, buff) =>{ // 需要被写入的内核代码
+  const sysBuffer = new Uint8Array(buff) 
+  fs.readFile('./9-4/kernel.img',{}, (err, buffer) => {
+    const arr = new Uint8Array(buffer) // 转换为数组进行二进制操作
+    sysBuffer.forEach((item, idx) => {
+      panel[idx] = item
+    })
+     //第一个柱面第二个扇区存入我们的数据 512*18*2 + 512
+  
+    const startLoction =   512*18*2 + 512
+    for(let i =0; i<arr.length; i++){
+      panel[startLoction + i] = arr[i]
+    }
+    fs.writeFile('./9-4/system.img',panel , 'binary', function(err) {
+    })
+  })
+})
+
+```
+后期会将所有的代码上传到github并在每个章节后附带地址
+
 接下来就要引入c语言环境，然后就可以基于C语言实现图形化界面，鼠标，命令行工具，抽象出上述操作系统的一些概念，如线程，进程，中断，文件系统等。
