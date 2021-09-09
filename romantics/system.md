@@ -694,6 +694,127 @@ fs.readFile('./9-4/boot.img', {}, (err, buff) =>{ // 需要被写入的内核代
 })
 
 ```
+<img :src="$withBase('./../imgs/system6.png')" />
+
+## 第五天 保护模式超强寻址
+全局描述符表(GDT) 该表的表项就叫描述符(descriptor),在描述符中 专门抽出4个字节 也就是32位数据来表示内存的基地址,这样,内存访问一下子就达到了4G,在原来的实模式下,cs, ds这些16位的寄存器往往用来存储段值 
+
+在保护模式下 这些寄存器用来存储指向GDT某个描述符的索引 
+
+在保护模式下 访问某处的内存时 仍然使用 `[寄存器:偏移]` 的方式，但是CPU的对地址的计算方法不再使用上面的公式，而是把寄存器中的值当做访问GDT的索引，在GDT中找到对应的描述符，从描述符中获得要访问内存的基地址，然后将基地址加上偏移，进而得到要访问的具体地址。
+我们需要模拟写入一个地址5M以外的数据，以测试寻址效果
+boot-read5m.s
+```
+%include "pm.inc"
+
+org   0x7c00
+
+jmp   LABEL_BEGIN
+
+[SECTION .gdt]
+ ;                                  段基址          段界限                属性
+LABEL_GDT:          Descriptor        0,            0,                   0  
+LABEL_DESC_CODE32:  Descriptor        0,      SegCode32Len - 1,       DA_C + DA_32
+LABEL_DESC_VIDEO:   Descriptor     0B8000h,         0ffffh,           DA_DRW
+LABEL_DESC_5M:      Descriptor     0500000h,        0ffffh,           DA_DRW
+
+GdtLen     equ    $ - LABEL_GDT
+GdtPtr     dw     GdtLen - 1
+           dd     0
+
+SelectorCode32    equ   LABEL_DESC_CODE32 -  LABEL_GDT
+SelectorVideo     equ   LABEL_DESC_VIDEO  -  LABEL_GDT
+Selector5M        equ   LABEL_DESC_5M - LABEL_GDT
+
+[SECTION  .s16]
+[BITS  16]
+LABEL_BEGIN:
+     mov   ax, cs
+     mov   ds, ax
+     mov   es, ax
+     mov   ss, ax
+     mov   sp, 0100h
+
+     xor   eax, eax
+     mov   ax,  cs
+     shl   eax, 4
+     add   eax, LABEL_SEG_CODE32
+     mov   word [LABEL_DESC_CODE32 + 2], ax
+     shr   eax, 16
+     mov   byte [LABEL_DESC_CODE32 + 4], al
+     mov   byte [LABEL_DESC_CODE32 + 7], ah
+
+     xor   eax, eax
+     mov   ax, ds
+     shl   eax, 4
+     add   eax,  LABEL_GDT
+     mov   dword  [GdtPtr + 2], eax
+
+     lgdt  [GdtPtr]
+
+     cli   ;关中断
+
+     in    al,  92h
+     or    al,  00000010b
+     out   92h, al
+
+     mov   eax, cr0
+     or    eax , 1
+     mov   cr0, eax
+
+     jmp   dword  SelectorCode32: 0
+
+     [SECTION .s32]
+     [BITS  32]
+LABEL_SEG_CODE32:
+    mov   ax, SelectorVideo
+    mov   gs, ax
+
+    mov   si, msg
+    mov   ax, Selector5M    ;用 es 指向5M内存描述符
+    mov   es, ax
+    mov   edi, 0
+
+write_msg_to_5M:  ;将si指向的字符一个个写到5M内存处
+    cmp   byte [si], 0
+    je    prepare_to_show_char
+    mov   al, [si]
+    mov   [es:edi], al
+    add   edi, 1
+    add   si, 1
+    jmp   write_msg_to_5M
+
+
+prepare_to_show_char:
+    mov   ebx, 10
+    mov   ecx, 2
+    mov   si, 0
+
+showChar:
+    mov   edi, (80*11)
+    add   edi, ebx
+    mov   eax, edi
+    mul   ecx
+    mov   edi, eax
+    mov   ah, 0ch
+    mov   al, [es:si]  ;由于es指向描述符LABEL_DESC_5M， 所以es:si 表示的地址是从5M开始的内存,si表示从5M开始后的偏移
+    cmp   al, 0
+    je    end
+    add   ebx,1
+    add   si, 1
+    mov   [gs:edi], ax
+    jmp   showChar
+end: 
+    jmp   $
+    msg:
+    DB     "This string is writeen to 5M memory", 0
+
+SegCode32Len   equ  $ - LABEL_SEG_CODE32
+```
+其他操作和第四天一致， 然后运行我们生成的的system.img就会打印`This string is writeen to 5M memory`
+<img :src="$withBase('./../imgs/system7.png')" />
+
+## 第六天 引入C语言
 后期会将所有的代码上传到github并在每个章节后附带地址
 
 接下来就要引入c语言环境，然后就可以基于C语言实现图形化界面，鼠标，命令行工具，抽象出上述操作系统的一些概念，如线程，进程，中断，文件系统等。
