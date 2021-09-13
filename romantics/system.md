@@ -814,7 +814,340 @@ SegCode32Len   equ  $ - LABEL_SEG_CODE32
 其他操作和第四天一致， 然后运行我们生成的的system.img就会打印`This string is writeen to 5M memory`
 <img :src="$withBase('./../imgs/system7.png')" />
 
-## 第六天 引入C语言
-后期会将所有的代码上传到github并在每个章节后附带地址
+## 第六天 交叉编译 汇编+C
+主要通过编译技术将多种不同的语言最终编译为一种后进而实现相互之间调用
+### 整体思路
+1. 汇编写的代码通过nasm生成二进制文件
+2. C语言的代码通过gcc编译并链接
+3. gcc生成的二进制文件进行反汇编，得到汇编代码
+4. 将步骤1和步骤3的代码进行合并
+   
+### 准备工作
+使用brew安装编译工具
+```
+brew install i386-elf-binutils
+brew install i386-elf-gcc
+```
+使用brew安装后的命令行命令可能因为各平台或者系统版本都有差异， 可通过命令行输入一些关键信息按tab键查看相关命令找到自己相关的命令
+<img :src="$withBase('./../imgs/system8.png')" />
+
+看了很多其他作者的相关文章，原本想说自己使用gcc生成，后来发现新版的mac系统的xcode已经不支持生成32位了，mac和ubantu等系统的教程大多都是根据自己的系统相关信息从而不一致的命令， 如部分博主的命令：i386-elf-gcc， i386-elf-ld, ld,等等。
+
+`上所有的操作默认编译32位系统， 目前最新的mac平台已经不支持32位了，所以我们要用第三方工具生成， 推荐使用linux虚拟机进行实验或者windows平台, MAC平台以下操作不能直接使用系统自带的gcc完成`
+
+汇编 => 二进制文件
+```bash
+nasm -f elf32 -o foo.o foo.asm
+```
+c文件 => 汇编
+```
+x86_64-elf-gcc -m32 bar.c -S  -o bar.asm
+```
+c => 二进制文件
+```bash
+x86_64-elf-gcc -m32 -fno-asynchronous-unwind-tables -s -c -o bar.o bar.c
+```
+
+然后将上面两个生产的.o文件进行链接： 
+``` zsh
+x86_64-elf-ld -m elf_i386 foo.o bar.o -o foobar
+```
+利用编译工具我们能将下面c代码编译为汇编代码
+```c
+extern void foo_print(char* p, int len);
+
+int  bar_func(int a, int b) {
+    if (a > b) {
+       foo_print("the 1st one\n", 13);
+    } else {
+       foo_print("the 2nd one\n", 13);
+    }
+
+    return 0;
+}
+
+```
+编译后的结果
+```asm
+; Disassembly of file: bar.o
+; Mon Sep 13 21:58:35 2021
+; Mode: 32 bits
+; Syntax: YASM/NASM
+; Instruction set: 80386
+
+
+global bar_func: function
+
+extern foo_print                                        ; near
+
+
+SECTION .text   align=1 execute                         ; section number 1, code
+
+bar_func:; Function begin
+        push    ebp                                     ; 0000 _ 55
+        mov     ebp, esp                                ; 0001 _ 89. E5
+        sub     esp, 8                                  ; 0003 _ 83. EC, 08
+        mov     eax, dword [ebp+8H]                     ; 0006 _ 8B. 45, 08
+        cmp     eax, dword [ebp+0CH]                    ; 0009 _ 3B. 45, 0C
+        jle     ?_001                                   ; 000C _ 7E, 14
+        sub     esp, 8                                  ; 000E _ 83. EC, 08
+        push    13                                      ; 0011 _ 6A, 0D
+        push    ?_003                                   ; 0013 _ 68, 00000000(d)
+        call    foo_print                               ; 0018 _ E8, FFFFFFFC(rel)
+        add     esp, 16                                 ; 001D _ 83. C4, 10
+        jmp     ?_002                                   ; 0020 _ EB, 12
+
+?_001:  sub     esp, 8                                  ; 0022 _ 83. EC, 08
+        push    13                                      ; 0025 _ 6A, 0D
+        push    ?_004                                   ; 0027 _ 68, 0000000D(d)
+        call    foo_print                               ; 002C _ E8, FFFFFFFC(rel)
+        add     esp, 16                                 ; 0031 _ 83. C4, 10
+?_002:  mov     eax, 0                                  ; 0034 _ B8, 00000000
+        leave                                           ; 0039 _ C9
+        ret                                             ; 003A _ C3
+; bar_func End of function
+
+
+SECTION .data   align=1 noexecute                       ; section number 2, data
+
+
+SECTION .bss    align=1 noexecute                       ; section number 3, bss
+
+
+SECTION .rodata align=1 noexecute                       ; section number 4, const
+
+?_003:                                                  ; byte
+        db 74H, 68H, 65H, 20H, 31H, 73H, 74H, 20H       ; 0000 _ the 1st 
+        db 6FH, 6EH, 65H, 0AH, 00H                      ; 0008 _ one..
+
+?_004:                                                  ; byte
+        db 74H, 68H, 65H, 20H, 32H, 6EH, 64H, 20H       ; 000D _ the 2nd 
+        db 6FH, 6EH, 65H, 0AH, 00H                      ; 0015 _ one..
+
+```
+然后在一个汇编文件中调用该c代码编译后的汇编文件
+```assembly
+
+[section .data]
+arg1  dd 3
+arg2  dd 4
+
+[section .text]
+global main
+global foo_print
+
+main:
+
+mov   eax, dword[arg1]
+push  eax
+mov   eax, dword [arg2]
+push  eax
+call  bar_func
+add   esp, 8
+
+mov   ebx,0
+mov   eax, 1
+int   0x80
+
+foo_print:
+mov   edx, [esp + 8]
+mov   ecx, [esp + 4]
+mov   ebx, 1
+mov   eax, 4
+int   0x80
+ret
+
+%include "bar.asm"
+```
+#### 注： 不同的教材和不同的平台都会有所不同，
+只要安装完工具能正常运行即可， 后续的步骤会用到该工具进行各种编译
+
+## 第七天 绘制图形界面
+要想由字符模式转入图形模式，我们需要操作硬件，特别是向显卡发送命令，让其进入图形显示模式，就如同前面我们所做的，要操作硬件，一般需要使用BIOS调用，以下几行就是打开VGA显卡色彩功能的代码：
+```assembly
+mov  al, 0x13h
+mov  ah, 0x00
+int  0x10
+```
+
+其中al 的值决定了要设置显卡的色彩模式，下面是一些常用的模式设置：
+0x03, 16色字符模式
+0x12, VGA图形模式, 640 * 480 * 4位彩色模式，独特的4面存储模式
+0x13, VGA图形模式, 320 * 200 * 8位彩色模式，调色板模式
+0x6a, 扩展VGA图形模式， 800 * 600 * 4彩色模式
+### 汇编系统内核
+
+结合第三天的知识， 我们需要使用第三天的boot.asm去加载我们的系统内核kernel.asm, 该内核主要实现保护模式启动，以及为C语言创建512字节大小的函数堆栈传惨调用
+```
+%include "pm.inc"
+
+org   0x9000
+
+jmp   LABEL_BEGIN
+
+[SECTION .gdt]
+ ;                                  段基址          段界限                属性
+LABEL_GDT:          Descriptor        0,            0,                   0  
+LABEL_DESC_CODE32:  Descriptor        0,      SegCode32Len - 1,       DA_C + DA_32
+LABEL_DESC_VIDEO:   Descriptor        0B8000h,         0ffffh,            DA_DRW
+LABEL_DESC_VRAM:    Descriptor        0,         0ffffffffh,            DA_DRW
+LABEL_DESC_STACK:   Descriptor        0,             TopOfStack,        DA_DRWA+DA_32
+
+GdtLen     equ    $ - LABEL_GDT
+GdtPtr     dw     GdtLen - 1
+           dd     0
+
+SelectorCode32    equ   LABEL_DESC_CODE32 -  LABEL_GDT
+SelectorVideo     equ   LABEL_DESC_VIDEO  -  LABEL_GDT
+SelectorStack     equ   LABEL_DESC_STACK  -  LABEL_GDT
+SelectorVram      equ   LABEL_DESC_VRAM   -  LABEL_GDT
+
+
+[SECTION  .s16]
+[BITS  16]
+LABEL_BEGIN:
+     mov   ax, cs
+     mov   ds, ax
+     mov   es, ax
+     mov   ss, ax
+     mov   sp, 0100h
+
+     mov   al, 0x13
+     mov   ah, 0
+     int   0x10
+
+     xor   eax, eax
+     mov   ax,  cs
+     shl   eax, 4
+     add   eax, LABEL_SEG_CODE32
+     mov   word [LABEL_DESC_CODE32 + 2], ax
+     shr   eax, 16
+     mov   byte [LABEL_DESC_CODE32 + 4], al
+     mov   byte [LABEL_DESC_CODE32 + 7], ah
+
+     ;set stack for C language
+     xor   eax, eax
+     mov   ax,  cs
+     shl   eax, 4
+     add   eax, LABEL_STACK
+     mov   word [LABEL_DESC_STACK + 2], ax
+     shr   eax, 16
+     mov   byte [LABEL_DESC_STACK + 4], al
+     mov   byte [LABEL_DESC_STACK + 7], ah
+
+     xor   eax, eax
+     mov   ax, ds
+     shl   eax, 4
+     add   eax,  LABEL_GDT
+     mov   dword  [GdtPtr + 2], eax
+
+     lgdt  [GdtPtr]
+
+     cli   ;关中断
+
+     in    al,  92h
+     or    al,  00000010b
+     out   92h, al
+
+     mov   eax, cr0
+     or    eax , 1
+     mov   cr0, eax
+
+     jmp   dword  SelectorCode32: 0
+
+     [SECTION .s32]
+     [BITS  32]
+     LABEL_SEG_CODE32:
+     ;initialize stack for c code
+     mov  ax, SelectorStack
+     mov  ss, ax
+     mov  esp, TopOfStack
+
+     mov  ax, SelectorVram
+     mov  ds,  ax
+
+C_CODE_ENTRY:
+     %include "write_vga.asm"
+
+
+     io_hlt:  ;void io_hlt(void);
+      HLT
+      RET
+
+SegCode32Len   equ  $ - LABEL_SEG_CODE32
+
+[SECTION .gs]
+ALIGN 32
+[BITS 32]
+LABEL_STACK:
+times 512  db 0
+TopOfStack  equ  $ - LABEL_STACK
+```
+语句%include write_vga.asm”， 表明，我们要开发的C代码文件叫write_vga.c, 我们写完C代码后，会使用上一节的步骤将它编译成汇编，然后include到我们当前的汇编文件里，统一编译成可执行内核。
+
+使用c绘制颜色
+```c
+void CMain(void) {
+    int i;
+    char*p = 0;
+    for (i = 0xa0000; i <= 0xaffff; i++) {
+        p = i;
+        *p = i & 0x0f;  
+    }
+    for(;;) {
+       io_hlt();
+    }
+}
+```
+先将c生成二进制
+```
+x86_64-elf-gcc -m32 -fno-asynchronous-unwind-tables -s -c -o write_vga.o write_vga.c
+```
+然后在反汇编生成汇编代码
+
+`注意： 在生产汇编代码中去掉以section 开始的指令，这些指令会影响我们把当前汇编结合入内核kerne.asm.
+同时去掉开头的两句：`
+```
+./objconv -fnasm write_vga.o write_vga.asm
+```
+然后再将内核代码生成二进制， 内核依赖的pm.inc(pm.inc可在第四天保护模式找到)和write_vga.asm文件我们都已经生成
+```
+nasm -o kernel.bat kernel.asm
+```
+kernel.bat写入了两个扇区，也就是说，我们内核的大小已经超过了512字节。此时我们需要修改一下内核加载器，让内核加载器一次读入两个扇区才能把内核完全加载入内存，打开boot.asm，将readFloppy中的：
+mov ah, 0x02
+mov al, 1
+改成：
+mov al, 2
+
+### 使用node合并为一个文件
+
+```js
+
+const fs = require('fs')
+const bufferInit = new ArrayBuffer(2 * 512 * 18 * 80) // 初始化软盘数据, 2个盘面*80个磁道*18个扇区*扇区大小512k
+const panel = new Uint8Array(bufferInit)
+fs.readFile('./9-13/boot.bat', {}, (err, buff) =>{ // 需要被写入的内核代码
+  const sysBuffer = new Uint8Array(buff) 
+  fs.readFile('./9-13/kernel.bat',{}, (err, buffer) => {
+    const arr = new Uint8Array(buffer) // 转换为数组进行二进制操作
+    sysBuffer.forEach((item, idx) => {
+      panel[idx] = item
+    })
+     //第一个柱面第二个扇区存入我们的数据 512*18*2 + 512
+  
+    const startLoction =   512*18*2 + 512
+    for(let i =0; i<arr.length; i++){
+      panel[startLoction + i] = arr[i]
+    }
+    fs.writeFile('./9-13/system.img',panel , 'binary', function(err) {
+    })
+  })
+})
+```
+运行node后使用虚拟机运行我们的system.img文件
+<img :src="$withBase('./../imgs/system9.png')" />
+
+后期会将所有的代码和objconv工具（适用mac平台）上传到github并在每个章节后附带地址
 
 接下来就要引入c语言环境，然后就可以基于C语言实现图形化界面，鼠标，命令行工具，抽象出上述操作系统的一些概念，如线程，进程，中断，文件系统等。
